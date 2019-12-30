@@ -1,7 +1,7 @@
 NAME=staple
 
 # Set the build dir, where built cross-compiled binaries will be output
-BUILDDIR := ../cmd
+BUILDDIR := build
 
 # List the GOOS and GOARCH to build
 GO_LDFLAGS_STATIC=-ldflags "-s -w $(CTIMEVAR) -extldflags -static"
@@ -10,7 +10,7 @@ GO_LDFLAGS_STATIC=-ldflags "-s -w $(CTIMEVAR) -extldflags -static"
 
 .PHONY: build
 build:
-	go build -ldflags="-s -w" -i -o ../cmd/${NAME}
+	go build -ldflags="-s -w" -i -o ${BUILDDIR}/${NAME} cmd/root.go
 
 .PHONY: test
 test:

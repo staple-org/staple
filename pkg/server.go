@@ -20,9 +20,6 @@ func Serve() error {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
-	//labeler := internal.NewGithubLabeler()
-	// Routes
-	//e.POST("/githook", GitWebHook(labeler))
 	api := "/rest/api/1"
 
 	e.POST(api+"/staple", func(context echo.Context) error {
