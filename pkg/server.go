@@ -4,12 +4,16 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"os"
 
-	"github.com/staple-org/staple/internal/service"
-
+	"github.com/gorilla/sessions"
+	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"golang.org/x/crypto/acme/autocert"
+
+	"github.com/staple-org/staple/internal/service"
+	"github.com/staple-org/staple/pkg/auth"
 )
 
 // Serve starts the Stapler API server.
@@ -22,6 +26,8 @@ func Serve() error {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 	e.Use(middleware.CORS())
+	sessionSecret := os.Getenv("STAPLE_SESSION_SECRET")
+	e.Use(session.Middleware(sessions.NewCookieStore([]byte(sessionSecret))))
 	//e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 	//	AllowOrigins: []string{"https://staple.cronohub.org"},
 	//	AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
@@ -30,16 +36,14 @@ func Serve() error {
 	api := "/rest/api/1"
 
 	// Landing page
-	e.POST(api+"/login", func(context echo.Context) error {
+	e.GET("/login", auth.LoginHandler())
+	e.POST("/logout", func(context echo.Context) error {
 		return nil
 	})
-	e.POST(api+"/logout", func(context echo.Context) error {
-		return nil
-	})
-	e.POST(api+"/callback", AddStaple(nil))
+	e.GET("/callback", auth.Callback())
 
 	stapler := service.NewPostgresStapler()
-	g := e.Group(api+"/staple", AuthZeroMiddleware)
+	g := e.Group(api+"/staple", auth.Middleware)
 	g.POST("/", AddStaple(stapler))
 	g.POST("/:id/archive", AddStaple(stapler))
 	g.POST("/:id/markasread", AddStaple(stapler))
