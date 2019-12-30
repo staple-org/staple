@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/staple-org/staple/internal/service"
+
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"golang.org/x/crypto/acme/autocert"
@@ -19,13 +21,31 @@ func Serve() error {
 	// Middleware
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
+	e.Use(middleware.CORS())
+	//e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+	//	AllowOrigins: []string{"https://staple.cronohub.org"},
+	//	AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
+	//}))
 
 	api := "/rest/api/1"
 
-	e.POST(api+"/staple", func(context echo.Context) error {
+	// Landing page
+	e.POST(api+"/login", func(context echo.Context) error {
 		return nil
 	})
+	e.POST(api+"/logout", func(context echo.Context) error {
+		return nil
+	})
+	e.POST(api+"/callback", AddStaple(nil))
 
+	stapler := service.NewPostgresStapler()
+	g := e.Group(api+"/staple", AuthZeroMiddleware)
+	g.POST("/", AddStaple(stapler))
+	g.POST("/:id/archive", AddStaple(stapler))
+	g.POST("/:id/markasread", AddStaple(stapler))
+	g.GET("/:id", AddStaple(stapler))
+	g.DELETE("/:id", DeleteStaple(stapler))
+	g.GET("/", AddStaple(stapler))
 
 	hostPort := fmt.Sprintf("%s:%s", Opts.Hostname, Opts.Port)
 
