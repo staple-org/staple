@@ -1,13 +1,13 @@
 package pkg
 
 import (
-	"log"
 	"net/http"
 
-	"github.com/labstack/echo-contrib/session"
-	"github.com/staple-org/staple/internal/users"
+	"github.com/staple-org/staple/internal/models"
 
+	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
+
 	"github.com/staple-org/staple/internal/service"
 )
 
@@ -19,11 +19,12 @@ func AddStaple(stapler service.Staplerer) echo.HandlerFunc {
 			return echo.NewHTTPError(http.StatusInternalServerError, "Session not found.")
 		}
 		profile := sess.Values["profile"].(map[string]interface{})
-		user := &users.User{
+		user := &models.User{
 			Nickname: profile["nickname"].(string),
 			ID:       profile["aud"].(string),
 		}
-		s, err := stapler.Create(user)
+		// TODO: Construct staple here. POST will have the information needed.
+		err = stapler.Create(models.Staple{}, user)
 		if err != nil {
 			var message = struct {
 				code    int
@@ -34,8 +35,7 @@ func AddStaple(stapler service.Staplerer) echo.HandlerFunc {
 			}
 			return c.JSON(http.StatusInternalServerError, message)
 		}
-		log.Printf("%+v", s)
-		return err
+		return c.NoContent(http.StatusOK)
 	}
 }
 
@@ -47,7 +47,7 @@ func ListStaples(stapler service.Staplerer) echo.HandlerFunc {
 			return echo.NewHTTPError(http.StatusInternalServerError, "Session not found.")
 		}
 		profile := sess.Values["profile"].(map[string]interface{})
-		user := &users.User{
+		user := &models.User{
 			Nickname: profile["nickname"].(string),
 			ID:       profile["aud"].(string),
 		}
@@ -63,7 +63,7 @@ func ListStaples(stapler service.Staplerer) echo.HandlerFunc {
 			return c.JSON(http.StatusInternalServerError, message)
 		}
 		var staples = struct {
-			Staples []service.Staple `json:"staples"`
+			Staples []models.Staple `json:"staples"`
 		}{
 			Staples: s,
 		}

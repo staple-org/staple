@@ -7,8 +7,6 @@ import (
 	"log"
 	"os"
 
-	"github.com/staple-org/staple/internal/storage"
-
 	"github.com/gorilla/sessions"
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
@@ -16,6 +14,7 @@ import (
 	"golang.org/x/crypto/acme/autocert"
 
 	"github.com/staple-org/staple/internal/service"
+	"github.com/staple-org/staple/internal/storage"
 	"github.com/staple-org/staple/pkg/auth"
 )
 
