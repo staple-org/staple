@@ -7,6 +7,8 @@ import (
 	"log"
 	"os"
 
+	"github.com/staple-org/staple/internal/storage"
+
 	"github.com/gorilla/sessions"
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
@@ -44,14 +46,15 @@ func Serve() error {
 	})
 	e.GET("/callback", auth.Callback())
 
-	stapler := service.NewPostgresStapler()
+	postgresStorer := storage.NewPostgresStorer()
+	stapler := service.NewStapler(postgresStorer)
 	g := e.Group(api+"/staple", auth.Middleware)
 	g.POST("/", AddStaple(stapler))
 	g.POST("/:id/archive", AddStaple(stapler))
 	g.POST("/:id/markasread", AddStaple(stapler))
 	g.GET("/:id", AddStaple(stapler))
 	g.DELETE("/:id", DeleteStaple(stapler))
-	g.GET("/", AddStaple(stapler))
+	g.GET("/", ListStaples(stapler))
 
 	hostPort := fmt.Sprintf("%s:%s", Opts.Hostname, Opts.Port)
 
