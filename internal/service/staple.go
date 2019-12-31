@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/staple-org/staple/internal/users"
@@ -46,31 +47,37 @@ func NewPostgresStapler() Staplerer {
 
 // Create creates a new Staple for the given user.
 func (p PostgresStapler) Create(user *users.User) (staple *Staple, err error) {
-	panic("implement me")
+	fmt.Println("Staple Create called.")
+	return nil, nil
 }
 
 // Delete deletes a given staple for a user.
 func (p PostgresStapler) Delete(user *users.User, id string) (err error) {
-	panic("implement me")
+	fmt.Println("Staple Delete called.")
+	return nil
 }
 
 // Get retrieves a Staple for a given user with ID.
 func (p PostgresStapler) Get(user *users.User, id string) (staple *Staple, err error) {
-	panic("implement me")
+	fmt.Println("Staple Get called.")
+	return nil, nil
 }
 
 // MarkAsRead marks a staple as read.
 func (p PostgresStapler) MarkAsRead(user *users.User, staple *Staple) (err error) {
-	panic("implement me")
+	fmt.Println("Staple Mark as Read called.")
+	return nil
 }
 
 // List lists all staples for a given user.
 func (p PostgresStapler) List(user *users.User) (staples []*Staple, err error) {
-	panic("implement me")
+	fmt.Println("Staple List called.")
+	return nil, nil
 }
 
 // Archive will archive a staple which isn't removed but rather not shown in the queue.
 // Archived Staples can be retrieved and vewied in any order.
 func (p PostgresStapler) Archive(user *users.User, staple *Staple) (err error) {
-	panic("implement me")
+	fmt.Println("Staple Archive called.")
+	return nil
 }
