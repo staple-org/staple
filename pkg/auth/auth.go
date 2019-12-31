@@ -17,16 +17,13 @@ import (
 // Middleware defines an authentication middleware using Auth 0.
 func Middleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		// c.Error(errors.New("unauthorized") // if auth0 returns 0... ?
-		// check if...
 		sess, err := session.Get("auth-session", c)
 		if err != nil {
-			c.Error(err)
-			return c.NoContent(http.StatusInternalServerError)
+			return echo.NewHTTPError(http.StatusUnauthorized, "User not logged in.")
 		}
-
 		if _, ok := sess.Values["profile"]; !ok {
-			return errors.New("user not logged in")
+			c.Error(err)
+			return echo.NewHTTPError(http.StatusUnauthorized, "User not logged in.")
 		}
 		return next(c)
 	}
@@ -80,6 +77,8 @@ func Callback() echo.HandlerFunc {
 			err := errors.New("state did not match with stored session value")
 			c.Error(err)
 			log.Println(err)
+			//log.Println("Query: ", c.QueryParam("state"))
+			//log.Println("Session: ", sess.Values["state"])
 			return c.NoContent(http.StatusBadRequest)
 		}
 
@@ -136,7 +135,7 @@ func Callback() echo.HandlerFunc {
 		}
 		// Hande auth zero callback.
 		// TODO: This won't be correct... Make a nice landing page of some sort?
-		url := c.Scheme() + "://" + c.Request().Host + c.Request().RequestURI + "/rest/api/1/staple"
+		url := c.Scheme() + "://" + c.Request().Host + "/rest/api/1/staple"
 		log.Println("redirecting...")
 		return c.Redirect(http.StatusTemporaryRedirect, url)
 	}
