@@ -72,30 +72,37 @@ func Callback() echo.HandlerFunc {
 		sess, err := session.Get("auth-session", c)
 		if err != nil {
 			c.Error(err)
+			log.Println(err)
 			return c.NoContent(http.StatusInternalServerError)
 		}
 
-		if c.Get("state") != sess.Values["state"] {
-			c.Error(errors.New("state did not match with stored session value"))
+		if c.QueryParam("state") != sess.Values["state"] {
+			err := errors.New("state did not match with stored session value")
+			c.Error(err)
+			log.Println(err)
 			return c.NoContent(http.StatusBadRequest)
 		}
 
 		authenticator, err := NewAuthenticator()
 		if err != nil {
 			c.Error(err)
+			log.Println(err)
 			return c.NoContent(http.StatusInternalServerError)
 		}
 
-		token, err := authenticator.Config.Exchange(context.TODO(), c.Get("code").(string))
+		token, err := authenticator.Config.Exchange(context.Background(), c.QueryParam("code"))
 		if err != nil {
 			log.Println("No token found.")
 			c.Error(err)
+			log.Println(err)
 			return c.NoContent(http.StatusUnauthorized)
 		}
 
 		rawIDToken, ok := token.Extra("id_token").(string)
 		if !ok {
-			c.Error(errors.New("no id_token field in oauth2 token"))
+			err := errors.New("no id_token field in oauth2 token")
+			c.Error(err)
+			log.Println(err)
 			return c.NoContent(http.StatusInternalServerError)
 		}
 
@@ -107,12 +114,14 @@ func Callback() echo.HandlerFunc {
 		idToken, err := authenticator.Provider.Verifier(oidcConfig).Verify(context.TODO(), rawIDToken)
 		if err != nil {
 			c.Error(err)
+			log.Println(err)
 			return c.NoContent(http.StatusInternalServerError)
 		}
 
 		var profile map[string]interface{}
 		if err := idToken.Claims(&profile); err != nil {
 			c.Error(err)
+			log.Println(err)
 			return c.NoContent(http.StatusInternalServerError)
 		}
 
@@ -122,10 +131,13 @@ func Callback() echo.HandlerFunc {
 		err = sess.Save(c.Request(), c.Response())
 		if err != nil {
 			c.Error(err)
+			log.Println(err)
 			return c.NoContent(http.StatusInternalServerError)
 		}
 		// Hande auth zero callback.
-		// figure out the correct URL...
-		return c.Redirect(http.StatusTemporaryRedirect, "/staple")
+		// TODO: This won't be correct... Make a nice landing page of some sort?
+		url := c.Scheme() + "://" + c.Request().Host + c.Request().RequestURI + "/rest/api/1/staple"
+		log.Println("redirecting...")
+		return c.Redirect(http.StatusTemporaryRedirect, url)
 	}
 }

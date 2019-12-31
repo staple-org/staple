@@ -1,6 +1,7 @@
 package pkg
 
 import (
+	"encoding/gob"
 	"errors"
 	"fmt"
 	"log"
@@ -34,6 +35,7 @@ func Serve() error {
 	//}))
 
 	api := "/rest/api/1"
+	gob.Register(map[string]interface{}{})
 
 	// Landing page
 	e.GET("/login", auth.LoginHandler())
