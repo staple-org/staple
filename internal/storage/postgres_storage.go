@@ -53,6 +53,11 @@ func (p PostgresStorer) Get(userID string, stapleID string) (models.Staple, erro
 	panic("implement me")
 }
 
+// Archive archives a staple.
+func (p PostgresStorer) Archive(userID string, stapleID string) error {
+	panic("implement me")
+}
+
 // List gets all the not archived staples for a user. List will not retrieve the content
 // since that can possibly be a large text. We only ever retrieve it when that
 // specific staple is Get.

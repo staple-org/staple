@@ -4,6 +4,8 @@ import (
 	"encoding/gob"
 	"errors"
 	"fmt"
+	"html/template"
+	"io"
 	"log"
 	"os"
 
@@ -18,11 +20,26 @@ import (
 	"github.com/staple-org/staple/pkg/auth"
 )
 
+// Template defines a Go HTML Template.
+type Template struct {
+	templates *template.Template
+}
+
+// Render renders a single Go HTML template.
+func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
+	return t.templates.ExecuteTemplate(w, name, data)
+}
+
 // Serve starts the Stapler API server.
 func Serve() error {
 	log.Println("Starting listener...")
 	// Echo instance
 	e := echo.New()
+	// Register the template renderer
+	t := &Template{
+		templates: template.Must(template.ParseGlob("templates/*.tmpl")),
+	}
+	e.Renderer = t
 
 	// Middleware
 	e.Use(middleware.Logger())
@@ -38,7 +55,13 @@ func Serve() error {
 	api := "/rest/api/1"
 	gob.Register(map[string]interface{}{})
 
-	// Landing page
+	// Render the templates
+	e.Static("/css", "./assets/css")
+	e.Static("/images", "./assets/images")
+	e.Static("/templates", "./templates")
+	e.GET("/", Index)
+
+	// Login/Logout page
 	e.GET("/login", auth.LoginHandler())
 	e.POST("/logout", func(context echo.Context) error {
 		return nil

@@ -8,4 +8,5 @@ type Storer interface {
 	Delete(userID string, stapleID string) error
 	Get(userID string, stapleID string) (models.Staple, error)
 	List(userID string) ([]models.Staple, error)
+	Archive(userID string, stapleID string) error
 }
