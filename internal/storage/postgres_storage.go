@@ -26,20 +26,20 @@ func connect() (*pgx.Conn, error) {
 }
 
 // Create will create a staple in the underlying postgres storage medium.
-func (p PostgresStorer) Create(staple models.Staple, userID string) error {
+func (p PostgresStorer) Create(staple models.Staple, username string) error {
 	conn, err := connect()
 	if err != nil {
 		return err
 	}
 	ctx := context.Background()
 	defer conn.Close(ctx)
-	_, err = conn.Exec(ctx, "insert into staples(name, id, content, archived, created_timestamp, user_id) values($1, $2, $3, $4, $5, $6)",
+	_, err = conn.Exec(ctx, "insert into staples(name, id, content, archived, created_timestamp, username) values($1, $2, $3, $4, $5, $6)",
 		staple.Name,
 		staple.ID,
 		staple.Content,
 		staple.Archived,
 		staple.CreatedTimestamp,
-		userID)
+		username)
 	return err
 }
 
@@ -68,7 +68,7 @@ func (p PostgresStorer) List(user string) ([]models.Staple, error) {
 	}
 	ctx := context.Background()
 	defer conn.Close(ctx)
-	rows, err := conn.Query(ctx, "select name, id, archived, created_timestamp from staples where user=$1 and archived = false", user)
+	rows, err := conn.Query(ctx, "select name, id, archived, created_timestamp from staples where username=$1 and archived = false", user)
 	if err != nil {
 		return nil, err
 	}
