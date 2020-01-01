@@ -135,7 +135,7 @@ func Callback() echo.HandlerFunc {
 		}
 		// Hande auth zero callback.
 		// TODO: This won't be correct... Make a nice landing page of some sort?
-		url := c.Scheme() + "://" + c.Request().Host + "/rest/api/1/staple/"
+		url := c.Scheme() + "://" + c.Request().Host + "/staples"
 		return c.Redirect(http.StatusTemporaryRedirect, url)
 	}
 }

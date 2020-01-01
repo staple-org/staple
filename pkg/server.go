@@ -70,16 +70,21 @@ func Serve() error {
 
 	postgresStorer := storage.NewPostgresStorer()
 	stapler := service.NewStapler(postgresStorer)
+
+	// REST api group
 	g := e.Group(api+"/staple", auth.Middleware)
 	g.POST("/", AddStaple(stapler))
 	g.POST("/:id/archive", AddStaple(stapler))
 	g.POST("/:id/markasread", AddStaple(stapler))
 	g.GET("/:id", AddStaple(stapler))
 	g.DELETE("/:id", DeleteStaple(stapler))
-	g.GET("/", ListStaples(stapler))
+	//g.GET("/", ListStaples(stapler))
+
+	// Template Group
+	s := e.Group("/staples", auth.Middleware)
+	s.GET("/", ListStaples(stapler))
 
 	hostPort := fmt.Sprintf("%s:%s", Opts.Hostname, Opts.Port)
-
 	// Start TLS with certificate paths
 	if len(Opts.ServerKeyPath) > 0 && len(Opts.ServerCrtPath) > 0 {
 		e.Pre(middleware.HTTPSRedirect())

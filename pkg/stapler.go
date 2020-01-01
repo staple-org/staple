@@ -3,11 +3,10 @@ package pkg
 import (
 	"net/http"
 
-	"github.com/staple-org/staple/internal/models"
-
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 
+	"github.com/staple-org/staple/internal/models"
 	"github.com/staple-org/staple/internal/service"
 )
 
@@ -53,21 +52,15 @@ func ListStaples(stapler service.Staplerer) echo.HandlerFunc {
 		}
 		s, err := stapler.List(user)
 		if err != nil {
-			var message = struct {
-				Code    int    `json:"code"`
-				Message string `json:"message"`
-			}{
-				Code:    http.StatusInternalServerError,
-				Message: err.Error(),
-			}
-			return c.JSON(http.StatusInternalServerError, message)
+			// Render error page instead
+			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 		}
 		var staples = struct {
 			Staples []models.Staple `json:"staples"`
 		}{
 			Staples: s,
 		}
-		return c.JSON(http.StatusOK, staples)
+		return c.Render(http.StatusOK, "list.tmpl", staples)
 	}
 }
 

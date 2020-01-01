@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<link rel="icon"
+      type="image/png"
+      href="images/favicon.ico" />
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="css/main.css">
+    <title>Staples List Page</title>
+</head>
+    <body>
+        {{ with .Staples }}
+            {{ range . }}
+                <tr>
+                    <td>{{.Name}}</td>
+                    <td>{{.ID}}</td>
+                    <td>{{.CreatedTimestamp}}</td>
+                    <td>{{if .Archived}}Archived{{ else }}Not Archived{{ end }}</td>
+                </tr>
+            {{end}}
+        {{ end }}
+    </body>
+</html>

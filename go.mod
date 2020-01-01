@@ -10,6 +10,7 @@ require (
 	github.com/jackc/pgx/v4 v4.1.2
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
 	github.com/kr/pty v1.1.8 // indirect
+	github.com/labstack/echo v3.3.10+incompatible
 	github.com/labstack/echo-contrib v0.8.0
 	github.com/labstack/echo/v4 v4.1.11
 	github.com/lib/pq v1.2.0
