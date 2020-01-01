@@ -82,7 +82,7 @@ func Serve() error {
 
 	// Template Group
 	s := e.Group("/staples", auth.Middleware)
-	s.GET("/", ListStaples(stapler))
+	s.GET("", ListStaples(stapler))
 
 	hostPort := fmt.Sprintf("%s:%s", Opts.Hostname, Opts.Port)
 	// Start TLS with certificate paths
