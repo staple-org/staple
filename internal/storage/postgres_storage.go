@@ -33,12 +33,12 @@ func (p PostgresStorer) Create(staple models.Staple, userID string) error {
 	}
 	ctx := context.Background()
 	defer conn.Close(ctx)
-	_, err = conn.Exec(ctx, "insert into staples(name, id, content, archived, create_timestamp, user_id) values($1, $2, $3, $4, $5, $6)",
+	_, err = conn.Exec(ctx, "insert into staples(name, id, content, archived, created_timestamp, user_id) values($1, $2, $3, $4, $5, $6)",
 		staple.Name,
 		staple.ID,
 		staple.Content,
 		staple.Archived,
-		staple.CreateTimestamp,
+		staple.CreatedTimestamp,
 		userID)
 	return err
 }
@@ -63,14 +63,14 @@ func (p PostgresStorer) List(userID string) ([]models.Staple, error) {
 	}
 	ctx := context.Background()
 	defer conn.Close(ctx)
-	rows, err := conn.Query(ctx, "select name, id, archived, create_timestamp from staples where user_id=$1 and archived = false", userID)
+	rows, err := conn.Query(ctx, "select name, id, archived, created_timestamp from staples where user_id=$1 and archived = false", userID)
 	if err != nil {
 		return nil, err
 	}
 	ret := make([]models.Staple, 0)
 	for rows.Next() {
 		staple := models.Staple{}
-		err = rows.Scan(&staple.Name, &staple.ID, &staple.Archived, &staple.CreateTimestamp)
+		err = rows.Scan(&staple.Name, &staple.ID, &staple.Archived, &staple.CreatedTimestamp)
 		if err != nil {
 			return nil, err
 		}

@@ -54,11 +54,11 @@ func ListStaples(stapler service.Staplerer) echo.HandlerFunc {
 		s, err := stapler.List(user)
 		if err != nil {
 			var message = struct {
-				code    int
-				message string
+				Code    int    `json:"code"`
+				Message string `json:"message"`
 			}{
-				code:    http.StatusInternalServerError,
-				message: "Unable to list staples for user.",
+				Code:    http.StatusInternalServerError,
+				Message: err.Error(),
 			}
 			return c.JSON(http.StatusInternalServerError, message)
 		}
