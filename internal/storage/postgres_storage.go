@@ -44,31 +44,31 @@ func (p PostgresStorer) Create(staple models.Staple, userID string) error {
 }
 
 // Delete removes a staple.
-func (p PostgresStorer) Delete(userID string, stapleID string) error {
+func (p PostgresStorer) Delete(user string, stapleID string) error {
 	panic("implement me")
 }
 
 // Get retrieves a staple.
-func (p PostgresStorer) Get(userID string, stapleID string) (models.Staple, error) {
+func (p PostgresStorer) Get(user string, stapleID string) (models.Staple, error) {
 	panic("implement me")
 }
 
 // Archive archives a staple.
-func (p PostgresStorer) Archive(userID string, stapleID string) error {
+func (p PostgresStorer) Archive(user string, stapleID string) error {
 	panic("implement me")
 }
 
 // List gets all the not archived staples for a user. List will not retrieve the content
 // since that can possibly be a large text. We only ever retrieve it when that
 // specific staple is Get.
-func (p PostgresStorer) List(userID string) ([]models.Staple, error) {
+func (p PostgresStorer) List(user string) ([]models.Staple, error) {
 	conn, err := connect()
 	if err != nil {
 		return nil, err
 	}
 	ctx := context.Background()
 	defer conn.Close(ctx)
-	rows, err := conn.Query(ctx, "select name, id, archived, created_timestamp from staples where user_id=$1 and archived = false", userID)
+	rows, err := conn.Query(ctx, "select name, id, archived, created_timestamp from staples where user=$1 and archived = false", user)
 	if err != nil {
 		return nil, err
 	}
