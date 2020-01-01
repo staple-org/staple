@@ -14,6 +14,7 @@ func init() {
 	flag.StringVar(&pkg.Opts.ServerCrtPath, "server-crt-path", "", "--server-crt-file /home/user/.server/server.crt")
 	flag.StringVar(&pkg.Opts.Port, "port", "9998", "--port 443")
 	flag.StringVar(&pkg.Opts.Hostname, "hostname", "localhost", "--hostname staple-clipper.org")
+	flag.StringVar(&pkg.Opts.GlobalTokenKey, "token-key", "", "--token-key <random-data>")
 	flag.Parse()
 }
 

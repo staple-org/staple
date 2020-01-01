@@ -63,7 +63,7 @@ func (p Stapler) MarkAsRead(user *models.User, staple models.Staple) error {
 // List lists all staples for a given user.
 func (p Stapler) List(user *models.User) ([]models.Staple, error) {
 	fmt.Println("Staple List called.")
-	list, err := p.storer.List(user.ID)
+	list, err := p.storer.List(user.Username)
 	if err != nil {
 		return nil, err
 	}

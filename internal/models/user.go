@@ -2,6 +2,6 @@ package models
 
 // User defines a user of the system.
 type User struct {
-	Nickname string
-	ID       string
+	// Auth0 provides unique nicknames. It's safe to use them as an ID.
+	Username string `json:"username"`
 }
