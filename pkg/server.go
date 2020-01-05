@@ -1,6 +1,7 @@
 package pkg
 
 import (
+	"context"
 	"crypto/rand"
 	"encoding/base64"
 	"errors"
@@ -46,10 +47,11 @@ func Serve() error {
 
 	// Generate a token for a given username.
 	e.POST("/get-token", TokenHandler())
-
+	ctx := context.Background()
 	// Register a user.
 	postgresUserStorer := storage.NewPostgresUserStorer()
-	e.POST("/register", RegisterUser(postgresUserStorer))
+	userHandler := service.NewUserHandler(ctx, postgresUserStorer)
+	e.POST("/register", RegisterUser(userHandler))
 
 	api := "/rest/api/1"
 	//gob.Register(map[string]interface{}{})

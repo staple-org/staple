@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/staple-org/staple/internal/storage"
+	"github.com/staple-org/staple/internal/service"
 
 	"github.com/staple-org/staple/internal/models"
 
@@ -74,11 +74,19 @@ func GetToken(c echo.Context) (*jwt.Token, error) {
 }
 
 // RegisterUser takes a storer and creates a user entry.
-func RegisterUser(store storage.UserStorer) echo.HandlerFunc {
+func RegisterUser(userHandler service.UserHandlerer) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		if u, _ := store.Get(c.FormValue("email")); u != nil {
+		u := models.User{
+			Email:    c.FormValue("email"),
+			Password: c.FormValue("password"),
+		}
+		if ok, err := userHandler.IsRegistered(u); ok {
 			return c.JSON(http.StatusBadRequest, map[string]string{
 				"message": "User already registered.",
+			})
+		} else if err != nil {
+			return c.JSON(http.StatusInternalServerError, map[string]string{
+				"error": err.Error(),
 			})
 		}
 		return nil

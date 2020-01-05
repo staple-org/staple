@@ -32,11 +32,6 @@ func (s PostgresUserStorer) Get(email string) (*models.User, error) {
 	panic("implement me")
 }
 
-// PasswordMatches checks if the given password matches with that of a saved one.
-func (s PostgresUserStorer) PasswordMatches(email string, password []byte) (bool, error) {
-	panic("implement me")
-}
-
 // Update updates a user with a given email address.
 func (s PostgresUserStorer) Update(email string, newUser models.User) error {
 	panic("implement me")

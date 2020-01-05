@@ -16,6 +16,5 @@ type UserStorer interface {
 	Create(email string, password []byte) error
 	Delete(email string) error
 	Get(email string) (*models.User, error)
-	PasswordMatches(email string, password []byte) (bool, error)
 	Update(email string, newUser models.User) error
 }
