@@ -7,6 +7,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/staple-org/staple/internal/storage"
+
 	"github.com/staple-org/staple/internal/models"
 
 	"github.com/dgrijalva/jwt-go"
@@ -29,7 +31,7 @@ func TokenHandler() echo.HandlerFunc {
 
 		// Set claims
 		claims := token.Claims.(jwt.MapClaims)
-		claims["username"] = user.Username // from context
+		claims["email"] = user.Email // from context
 		claims["admin"] = true
 		claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
 
@@ -69,4 +71,16 @@ func GetToken(c echo.Context) (*jwt.Token, error) {
 	}
 
 	return token, nil
+}
+
+// RegisterUser takes a storer and creates a user entry.
+func RegisterUser(store storage.UserStorer) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		if u, _ := store.Get(c.FormValue("email")); u != nil {
+			return c.JSON(http.StatusBadRequest, map[string]string{
+				"message": "User already registered.",
+			})
+		}
+		return nil
+	}
 }

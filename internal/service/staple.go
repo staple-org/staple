@@ -9,13 +9,8 @@ import (
 	"github.com/staple-org/staple/internal/storage"
 )
 
-// Staplerer should be able to do that following:
-// Create Staple for a user
-// Delete Staple for a user
-// Get a Staple for a user
-// Archive Staple
-// MarkAsRead
-// List Staples for a user
+// Staplerer describes a stapler service which takes care of managing
+// the user's staples.
 type Staplerer interface {
 	Create(staple models.Staple, user *models.User) (err error)
 	Delete(user *models.User, id string) (err error)
@@ -28,11 +23,11 @@ type Staplerer interface {
 // Stapler defines a stapler which stores the staples in Postgres DB.
 type Stapler struct {
 	ctx    context.Context
-	storer storage.Storer
+	storer storage.StapleStorer
 }
 
 // NewStapler creates a new Postgres based Stapler which will have a connection to a DB.
-func NewStapler(storer storage.Storer) Stapler {
+func NewStapler(storer storage.StapleStorer) Stapler {
 	return Stapler{ctx: context.Background(), storer: storer}
 }
 
@@ -62,8 +57,7 @@ func (p Stapler) MarkAsRead(user *models.User, staple models.Staple) error {
 
 // List lists all staples for a given user.
 func (p Stapler) List(user *models.User) ([]models.Staple, error) {
-	fmt.Println("Staple List called.")
-	list, err := p.storer.List(user.Username)
+	list, err := p.storer.List(user.Email)
 	if err != nil {
 		return nil, err
 	}

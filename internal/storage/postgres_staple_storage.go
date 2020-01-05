@@ -9,15 +9,15 @@ import (
 	"github.com/staple-org/staple/internal/models"
 )
 
-// PostgresStorer is a storer which uses Postgres as a storage backend.
-type PostgresStorer struct{}
+// PostgresStapleStorer is a storer which uses Postgres as a storage backend.
+type PostgresStapleStorer struct{}
 
-// NewPostgresStorer creates a new Postgres storage medium.
-func NewPostgresStorer() PostgresStorer {
-	return PostgresStorer{}
+// NewPostgresStapleStorer creates a new Postgres storage medium.
+func NewPostgresStapleStorer() PostgresStapleStorer {
+	return PostgresStapleStorer{}
 }
 
-func connect() (*pgx.Conn, error) {
+func (p PostgresStapleStorer) connect() (*pgx.Conn, error) {
 	conn, err := pgx.Connect(context.Background(), os.Getenv("STAPLE_DATABASE_URL"))
 	if err != nil {
 		return nil, err
@@ -26,8 +26,8 @@ func connect() (*pgx.Conn, error) {
 }
 
 // Create will create a staple in the underlying postgres storage medium.
-func (p PostgresStorer) Create(staple models.Staple, username string) error {
-	conn, err := connect()
+func (p PostgresStapleStorer) Create(staple models.Staple, email string) error {
+	conn, err := p.connect()
 	if err != nil {
 		return err
 	}
@@ -39,36 +39,36 @@ func (p PostgresStorer) Create(staple models.Staple, username string) error {
 		staple.Content,
 		staple.Archived,
 		staple.CreatedTimestamp,
-		username)
+		email)
 	return err
 }
 
 // Delete removes a staple.
-func (p PostgresStorer) Delete(user string, stapleID string) error {
+func (p PostgresStapleStorer) Delete(email string, stapleID string) error {
 	panic("implement me")
 }
 
 // Get retrieves a staple.
-func (p PostgresStorer) Get(user string, stapleID string) (models.Staple, error) {
+func (p PostgresStapleStorer) Get(email string, stapleID string) (models.Staple, error) {
 	panic("implement me")
 }
 
 // Archive archives a staple.
-func (p PostgresStorer) Archive(user string, stapleID string) error {
+func (p PostgresStapleStorer) Archive(email string, stapleID string) error {
 	panic("implement me")
 }
 
 // List gets all the not archived staples for a user. List will not retrieve the content
 // since that can possibly be a large text. We only ever retrieve it when that
 // specific staple is Get.
-func (p PostgresStorer) List(user string) ([]models.Staple, error) {
-	conn, err := connect()
+func (p PostgresStapleStorer) List(email string) ([]models.Staple, error) {
+	conn, err := p.connect()
 	if err != nil {
 		return nil, err
 	}
 	ctx := context.Background()
 	defer conn.Close(ctx)
-	rows, err := conn.Query(ctx, "select name, id, archived, created_timestamp from staples where username=$1 and archived = false", user)
+	rows, err := conn.Query(ctx, "select name, id, archived, created_timestamp from staples where username=$1 and archived = false", email)
 	if err != nil {
 		return nil, err
 	}

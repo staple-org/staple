@@ -21,7 +21,7 @@ func AddStaple(stapler service.Staplerer) echo.HandlerFunc {
 		}
 		profile := sess.Values["profile"].(map[string]interface{})
 		user := &models.User{
-			Username: profile["nickname"].(string),
+			Email: profile["nickname"].(string),
 		}
 		// TODO: Construct staple here. POST will have the information needed.
 		err = stapler.Create(models.Staple{}, user)
@@ -49,9 +49,9 @@ func ListStaples(stapler service.Staplerer) echo.HandlerFunc {
 			return err
 		}
 		claims := token.Claims.(jwt.MapClaims)
-		username := claims["username"].(string)
+		email := claims["email"].(string)
 		userModel := &models.User{
-			Username: username,
+			Email: email,
 		}
 		s, err := stapler.List(userModel)
 		if err != nil {

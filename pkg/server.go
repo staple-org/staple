@@ -47,11 +47,15 @@ func Serve() error {
 	// Generate a token for a given username.
 	e.POST("/get-token", TokenHandler())
 
+	// Register a user.
+	postgresUserStorer := storage.NewPostgresUserStorer()
+	e.POST("/register", RegisterUser(postgresUserStorer))
+
 	api := "/rest/api/1"
 	//gob.Register(map[string]interface{}{})
 
-	postgresStorer := storage.NewPostgresStorer()
-	stapler := service.NewStapler(postgresStorer)
+	postgresStapleStorer := storage.NewPostgresStapleStorer()
+	stapler := service.NewStapler(postgresStapleStorer)
 
 	// REST api group
 	g := e.Group(api+"/staple", middleware.JWT([]byte(Opts.GlobalTokenKey)))
