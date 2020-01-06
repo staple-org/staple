@@ -16,15 +16,20 @@ import (
 )
 
 // TokenHandler creates a JWT token for a given user.
-func TokenHandler() echo.HandlerFunc {
+func TokenHandler(userHandler service.UserHandlerer) echo.HandlerFunc {
 	return func(c echo.Context) error {
 
-		// TODO: Verify that this user exists.
 		// Get the nickname for the token.
 		user := &models.User{}
 		err := c.Bind(user)
 		if err != nil {
 			return err
+		}
+
+		if ok, _ := userHandler.IsRegistered(*user); !ok {
+			return c.JSON(http.StatusBadRequest, map[string]string{
+				"message": "user not found",
+			})
 		}
 		// Create token
 		token := jwt.New(jwt.SigningMethodHS256)
