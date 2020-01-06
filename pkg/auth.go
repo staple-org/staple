@@ -25,10 +25,25 @@ func TokenHandler(userHandler service.UserHandlerer) echo.HandlerFunc {
 		if err != nil {
 			return err
 		}
+		if user.Email == "" || user.Password == "" {
+			return c.JSON(http.StatusBadRequest, map[string]string{
+				"message": "Invalid username or password",
+			})
+		}
 
 		if ok, _ := userHandler.IsRegistered(*user); !ok {
 			return c.JSON(http.StatusBadRequest, map[string]string{
 				"message": "user not found",
+			})
+		}
+
+		if ok, err := userHandler.PasswordMatch(*user); !ok {
+			return c.JSON(http.StatusBadRequest, map[string]string{
+				"message": "password mismatch",
+			})
+		} else if err != nil {
+			return c.JSON(http.StatusInternalServerError, map[string]string{
+				"message": "error while getting password: " + err.Error(),
 			})
 		}
 		// Create token
@@ -81,11 +96,18 @@ func GetToken(c echo.Context) (*jwt.Token, error) {
 // RegisterUser takes a storer and creates a user entry.
 func RegisterUser(userHandler service.UserHandlerer) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		u := models.User{
-			Email:    c.FormValue("email"),
-			Password: c.FormValue("password"),
+		// Get the nickname for the token.
+		user := &models.User{}
+		err := c.Bind(user)
+		if user.Email == "" || user.Password == "" {
+			return c.JSON(http.StatusBadRequest, map[string]string{
+				"message": "Invalid username or password",
+			})
 		}
-		if ok, err := userHandler.IsRegistered(u); ok {
+		if err != nil {
+			return err
+		}
+		if ok, err := userHandler.IsRegistered(*user); ok {
 			return c.JSON(http.StatusBadRequest, map[string]string{
 				"message": "User already registered.",
 			})
@@ -94,6 +116,6 @@ func RegisterUser(userHandler service.UserHandlerer) echo.HandlerFunc {
 				"error": err.Error(),
 			})
 		}
-		return nil
+		return userHandler.Register(*user)
 	}
 }

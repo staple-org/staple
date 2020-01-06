@@ -16,7 +16,6 @@ type UserHandlerer interface {
 	Delete(user models.User) error
 	ResetPassword(user models.User) error
 	IsRegistered(user models.User) (ok bool, err error)
-	GetToken(user models.User) (token string, err error)
 	PasswordMatch(user models.User) (ok bool, err error)
 }
 
@@ -45,12 +44,17 @@ func (u UserHandler) Delete(user models.User) error {
 	if ok, _ := u.IsRegistered(user); !ok {
 		return errors.New("user not found")
 	}
+	if ok, err := u.PasswordMatch(user); !ok {
+		return errors.New("password did not match")
+	} else if err != nil {
+		return err
+	}
 	return u.store.Delete(user.Email)
 }
 
 // ResetPassword generates a new password for a user and send it via email.
 func (u UserHandler) ResetPassword(user models.User) error {
-	panic("implement me")
+	return nil
 }
 
 // IsRegistered checks if a user exists in the system.
@@ -63,11 +67,6 @@ func (u UserHandler) IsRegistered(user models.User) (ok bool, err error) {
 		return false, nil
 	}
 	return true, nil
-}
-
-// GetToken generates a JWT token for a given user.
-func (u UserHandler) GetToken(user models.User) (token string, err error) {
-	panic("implement me")
 }
 
 // PasswordMatch checks if a stored password matches that of a given one.

@@ -45,17 +45,16 @@ func Serve() error {
 	//	AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
 	//}))
 
-	// Generate a token for a given username.
-	e.POST("/get-token", TokenHandler())
-	ctx := context.Background()
 	// Register a user.
+	ctx := context.Background()
 	postgresUserStorer := storage.NewPostgresUserStorer()
 	userHandler := service.NewUserHandler(ctx, postgresUserStorer)
 	e.POST("/register", RegisterUser(userHandler))
+	// Generate a token for a given username.
+	e.POST("/get-token", TokenHandler(userHandler))
 
 	api := "/rest/api/1"
 	//gob.Register(map[string]interface{}{})
-
 	postgresStapleStorer := storage.NewPostgresStapleStorer()
 	stapler := service.NewStapler(postgresStapleStorer)
 

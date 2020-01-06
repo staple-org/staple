@@ -19,17 +19,51 @@ func NewPostgresUserStorer() PostgresUserStorer {
 
 // Create saves a user in the db.
 func (s PostgresUserStorer) Create(email string, password []byte) error {
-	panic("implement me")
+	conn, err := s.connect()
+	if err != nil {
+		return err
+	}
+	ctx := context.Background()
+	defer conn.Close(ctx)
+	_, err = conn.Exec(ctx, "insert into users(email, password) values($1, $2)",
+		email,
+		password)
+	return err
 }
 
 // Delete deletes a user from the db.
 func (s PostgresUserStorer) Delete(email string) error {
-	panic("implement me")
+	conn, err := s.connect()
+	if err != nil {
+		return err
+	}
+	ctx := context.Background()
+	defer conn.Close(ctx)
+	_, err = conn.Exec(ctx, "delete from users where email = $1",
+		email)
+	return err
 }
 
 // Get retrieves a user.
 func (s PostgresUserStorer) Get(email string) (*models.User, error) {
-	panic("implement me")
+	conn, err := s.connect()
+	if err != nil {
+		return nil, err
+	}
+	ctx := context.Background()
+	defer conn.Close(ctx)
+	var (
+		storedEmail string
+		password    []byte
+	)
+	err = conn.QueryRow(ctx, "select email, password from users where email = $1", email).Scan(&storedEmail, &password)
+	if err != nil {
+		if err.Error() == "no rows in result set" {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return &models.User{Email: storedEmail, Password: string(password)}, nil
 }
 
 // Update updates a user with a given email address.
