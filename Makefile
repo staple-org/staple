@@ -19,3 +19,7 @@ test:
 .PHONY: clean
 clean:
 	go clean -i
+
+.PHONY: run
+run:
+	go run cmd/root.go
