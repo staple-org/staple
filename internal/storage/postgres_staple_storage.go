@@ -68,7 +68,7 @@ func (p PostgresStapleStorer) List(email string) ([]models.Staple, error) {
 	}
 	ctx := context.Background()
 	defer conn.Close(ctx)
-	rows, err := conn.Query(ctx, "select name, id, archived, created_timestamp from staples where username=$1 and archived = false", email)
+	rows, err := conn.Query(ctx, "select name, id, archived, created_timestamp from staples where user_email=$1 and archived = false", email)
 	if err != nil {
 		return nil, err
 	}
