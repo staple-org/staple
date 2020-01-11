@@ -34,9 +34,8 @@ func (p PostgresStapleStorer) Create(staple models.Staple, email string) error {
 	}
 	ctx := context.Background()
 	defer conn.Close(ctx)
-	_, err = conn.Exec(ctx, "insert into staples(name, id, content, archived, createdAt, username) values($1, $2, $3, $4, $5, $6)",
+	_, err = conn.Exec(ctx, "insert into staples(name, content, archived, createdAt, user_email) values($1, $2, $3, $4, $5)",
 		staple.Name,
-		staple.ID,
 		staple.Content,
 		staple.Archived,
 		staple.CreatedAt,

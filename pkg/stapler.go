@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/dgrijalva/jwt-go"
 
@@ -14,6 +15,8 @@ import (
 )
 
 // AddStaple creates a staple using a stapler and a given user.
+// The following properties are enough:
+// name, content
 func AddStaple(stapler service.Staplerer) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		token, err := GetToken(c)
@@ -31,9 +34,9 @@ func AddStaple(stapler service.Staplerer) echo.HandlerFunc {
 			apiError := ApiError("failed to bind body", http.StatusInternalServerError, err)
 			return c.JSON(http.StatusInternalServerError, apiError)
 		}
-
+		staple.CreatedAt = time.Now()
 		// ID needs to be sequential.
-		err = stapler.Create(models.Staple{}, userModel)
+		err = stapler.Create(*staple, userModel)
 		if err != nil {
 			apiError := ApiError("Unable to create staple for user.", http.StatusInternalServerError, err)
 			return c.JSON(http.StatusInternalServerError, apiError)
