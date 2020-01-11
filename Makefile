@@ -25,5 +25,5 @@ run:
 	go run cmd/root.go
 
 .PHONY: start-https
-run:
+start-https:
 	go run cmd/root.go --server-key-path ./certs/key.pem --server-crt-path ./certs/cert.pem
