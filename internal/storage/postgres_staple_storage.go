@@ -34,7 +34,7 @@ func (p PostgresStapleStorer) Create(staple models.Staple, email string) error {
 	}
 	ctx := context.Background()
 	defer conn.Close(ctx)
-	_, err = conn.Exec(ctx, "insert into staples(name, content, archived, createdAt, user_email) values($1, $2, $3, $4, $5)",
+	_, err = conn.Exec(ctx, "insert into staples(name, content, archived, created_at, user_email) values($1, $2, $3, $4, $5)",
 		staple.Name,
 		staple.Content,
 		staple.Archived,
@@ -45,7 +45,14 @@ func (p PostgresStapleStorer) Create(staple models.Staple, email string) error {
 
 // Delete removes a staple.
 func (p PostgresStapleStorer) Delete(email string, stapleID int) error {
-	panic("implement me")
+	conn, err := p.connect()
+	if err != nil {
+		return err
+	}
+	ctx := context.Background()
+	defer conn.Close(ctx)
+	_, err = conn.Exec(ctx, "delete from staples where id = $1 and user_email = $2", stapleID, email)
+	return err
 }
 
 // Get retrieves a staple.
@@ -62,7 +69,7 @@ func (p PostgresStapleStorer) Get(email string, stapleID int) (*models.Staple, e
 		archived      bool
 		createdAt     time.Time
 	)
-	err = conn.QueryRow(ctx, "select name, id, content, archived, createdAt from staples where user_email = $1 and id = $2", email, stapleID).Scan(
+	err = conn.QueryRow(ctx, "select name, id, content, archived, created_at from staples where user_email = $1 and id = $2", email, stapleID).Scan(
 		&name,
 		&id,
 		&content,
@@ -97,7 +104,7 @@ func (p PostgresStapleStorer) Oldest(email string) (*models.Staple, error) {
 		archived      bool
 		createdAt     time.Time
 	)
-	err = conn.QueryRow(ctx, "select name, id, content, archived, createdAt from staples s1 where createdAt = (select MIN(createdAt) from staples s2 where s2.id = s1.id and s2.user_email = $1)", email).Scan(
+	err = conn.QueryRow(ctx, "select name, id, content, archived, created_at from staples s1 where created_at = (select MIN(created_at) from staples s2 where s2.id = s1.id and s2.user_email = $1)", email).Scan(
 		&name,
 		&id,
 		&content,
@@ -120,7 +127,14 @@ func (p PostgresStapleStorer) Oldest(email string) (*models.Staple, error) {
 
 // Archive archives a staple.
 func (p PostgresStapleStorer) Archive(email string, stapleID int) error {
-	panic("implement me")
+	conn, err := p.connect()
+	if err != nil {
+		return err
+	}
+	ctx := context.Background()
+	defer conn.Close(ctx)
+	_, err = conn.Exec(ctx, "update staples set archived = true where user_email = $1 and id = $2", email, stapleID)
+	return err
 }
 
 // List gets all the not archived staples for a user. List will not retrieve the content
@@ -133,7 +147,7 @@ func (p PostgresStapleStorer) List(email string) ([]models.Staple, error) {
 	}
 	ctx := context.Background()
 	defer conn.Close(ctx)
-	rows, err := conn.Query(ctx, "select name, id, archived, createdAt from staples where user_email=$1 and archived = false", email)
+	rows, err := conn.Query(ctx, "select name, id, archived, created_at from staples where user_email=$1 and archived = false", email)
 	if err != nil {
 		return nil, err
 	}

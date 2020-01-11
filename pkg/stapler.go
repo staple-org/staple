@@ -34,7 +34,7 @@ func AddStaple(stapler service.Staplerer) echo.HandlerFunc {
 			apiError := ApiError("failed to bind body", http.StatusInternalServerError, err)
 			return c.JSON(http.StatusInternalServerError, apiError)
 		}
-		staple.CreatedAt = time.Now()
+		staple.CreatedAt = time.Now().UTC()
 		// ID needs to be sequential.
 		err = stapler.Create(*staple, userModel)
 		if err != nil {
@@ -159,6 +159,37 @@ func DeleteStaple(stapler service.Staplerer) echo.HandlerFunc {
 			return c.JSON(http.StatusInternalServerError, apiError)
 		}
 		err = stapler.Delete(userModel, n)
+		if err != nil {
+			apiError := ApiError("Unable to delete staple.", http.StatusInternalServerError, err)
+			return c.JSON(http.StatusInternalServerError, apiError)
+		}
+		return c.NoContent(http.StatusOK)
+	}
+}
+
+// ArchiveStaple archives a staple with a given ID.
+func ArchiveStaple(stapler service.Staplerer) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		// Get user ID from context.. Call delete.
+		token, err := GetToken(c)
+		if err != nil {
+			return err
+		}
+		claims := token.Claims.(jwt.MapClaims)
+		email := claims["email"].(string)
+		userModel := &models.User{
+			Email: email,
+		}
+		id := c.Param("id")
+		if id == "" {
+			return errors.New("invalid id")
+		}
+		n, err := strconv.Atoi(id)
+		if err != nil {
+			apiError := ApiError("failed to convert id to number", http.StatusInternalServerError, err)
+			return c.JSON(http.StatusInternalServerError, apiError)
+		}
+		err = stapler.Archive(userModel, n)
 		if err != nil {
 			apiError := ApiError("Unable to delete staple.", http.StatusInternalServerError, err)
 			return c.JSON(http.StatusInternalServerError, apiError)

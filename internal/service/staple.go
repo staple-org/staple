@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/staple-org/staple/internal/models"
 
@@ -17,7 +16,7 @@ type Staplerer interface {
 	Get(user *models.User, id int) (staple *models.Staple, err error)
 	GetNext(user *models.User) (staple *models.Staple, err error)
 	List(user *models.User) (staples []models.Staple, err error)
-	Archive(user *models.User, staple models.Staple) (err error)
+	Archive(user *models.User, id int) (err error)
 }
 
 // Stapler defines a stapler which stores the staples in Postgres DB.
@@ -62,7 +61,6 @@ func (p Stapler) List(user *models.User) ([]models.Staple, error) {
 
 // Archive will archive a staple which isn't removed but rather not shown in the queue.
 // Archived Staples can be retrieved and vewied in any order.
-func (p Stapler) Archive(user *models.User, staple models.Staple) error {
-	fmt.Println("Staple Archive called.")
-	return nil
+func (p Stapler) Archive(user *models.User, id int) error {
+	return p.storer.Archive(user.Email, id)
 }

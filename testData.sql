@@ -1,11 +1,11 @@
 create table users (email varchar(255), password text);
-create table staples (name varchar(255), id serial, content text, createdAt timestamp, archived bool, user_email varchar(255));
-insert into staples(name, content, createdAt, archived, user_email) values('test', 'testcontent', now(), false, 'test1@gmail.com');
-insert into staples(name, content, createdAt, archived, user_email) values('test2', 'testcontent2', now(), false, 'test1@gmail.com');
-insert into staples(name, content, createdAt, archived, user_email) values('test3', 'testcontent3', now(), false, 'test1@gmail.com');
-insert into staples(name, content, createdAt, archived, user_email) values('test4', 'testcontent', now(), false, 'test2@test.com');
-insert into staples(name, content, createdAt, archived, user_email) values('test5', 'testcontent2', now(), false, 'test2@test.com');
-insert into staples(name, content, createdAt, archived, user_email) values('test6', 'testcontent3', now(), false, 'test2@test.com');
+create table staples (name varchar(255), id serial, content text, created_at timestamp, archived bool, user_email varchar(255));
+insert into staples(name, content, created_at, archived, user_email) values('test', 'testcontent', now(), false, 'test1@gmail.com');
+insert into staples(name, content, created_at, archived, user_email) values('test2', 'testcontent2', now(), false, 'test1@gmail.com');
+insert into staples(name, content, created_at, archived, user_email) values('test3', 'testcontent3', now(), false, 'test1@gmail.com');
+insert into staples(name, content, created_at, archived, user_email) values('test4', 'testcontent', now(), false, 'test2@test.com');
+insert into staples(name, content, created_at, archived, user_email) values('test5', 'testcontent2', now(), false, 'test2@test.com');
+insert into staples(name, content, created_at, archived, user_email) values('test6', 'testcontent3', now(), false, 'test2@test.com');
 create user staple with password 'password123';
 create database staples;
 GRANT ALL PRIVILEGES ON DATABASE staples TO staple;
