@@ -6,7 +6,6 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 
-	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 
 	"github.com/staple-org/staple/internal/models"
@@ -16,16 +15,23 @@ import (
 // AddStaple creates a staple using a stapler and a given user.
 func AddStaple(stapler service.Staplerer) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		sess, err := session.Get("auth-session", c)
+		token, err := GetToken(c)
 		if err != nil {
-			return echo.NewHTTPError(http.StatusInternalServerError, "Session not found.")
+			return err
 		}
-		profile := sess.Values["profile"].(map[string]interface{})
-		user := &models.User{
-			Email: profile["nickname"].(string),
+		claims := token.Claims.(jwt.MapClaims)
+		email := claims["email"].(string)
+		userModel := &models.User{
+			Email: email,
 		}
-		// TODO: Construct staple here. POST will have the information needed.
-		err = stapler.Create(models.Staple{}, user)
+		staple := &models.Staple{}
+		err = c.Bind(staple)
+		if err != nil {
+			apiError := ApiError("failed to bind body", http.StatusInternalServerError, err)
+			return c.JSON(http.StatusInternalServerError, apiError)
+		}
+
+		err = stapler.Create(models.Staple{}, userModel)
 		if err != nil {
 			apiError := ApiError("Unable to create staple for user.", http.StatusInternalServerError, err)
 			return c.JSON(http.StatusInternalServerError, apiError)
@@ -105,6 +111,24 @@ func ListStaples(stapler service.Staplerer) echo.HandlerFunc {
 func DeleteStaple(stapler service.Staplerer) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		// Get user ID from context.. Call delete.
-		return stapler.Delete(nil, "")
+		token, err := GetToken(c)
+		if err != nil {
+			return err
+		}
+		claims := token.Claims.(jwt.MapClaims)
+		email := claims["email"].(string)
+		userModel := &models.User{
+			Email: email,
+		}
+		id := c.Param("id")
+		if id == "" {
+			return errors.New("invalid id")
+		}
+		err = stapler.Delete(userModel, id)
+		if err != nil {
+			apiError := ApiError("Unable to delete staple.", http.StatusInternalServerError, err)
+			return c.JSON(http.StatusInternalServerError, apiError)
+		}
+		return c.NoContent(http.StatusOK)
 	}
 }

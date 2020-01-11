@@ -16,7 +16,6 @@ type Staplerer interface {
 	Delete(user *models.User, id string) (err error)
 	Get(user *models.User, id string) (staple *models.Staple, err error)
 	GetNext(user *models.User) (staple *models.Staple, err error)
-	MarkAsRead(user *models.User, staple models.Staple) (err error)
 	List(user *models.User) (staples []models.Staple, err error)
 	Archive(user *models.User, staple models.Staple) (err error)
 }
@@ -34,14 +33,12 @@ func NewStapler(storer storage.StapleStorer) Stapler {
 
 // Create creates a new Staple for the given user.
 func (p Stapler) Create(staple models.Staple, user *models.User) error {
-	fmt.Println("Staple created for user: ", user)
-	return nil
+	return p.storer.Create(staple, user.Email)
 }
 
 // Delete deletes a given staple for a user.
 func (p Stapler) Delete(user *models.User, id string) (err error) {
-	fmt.Println("Staple Delete called.")
-	return nil
+	return p.storer.Delete(user.Email, id)
 }
 
 // GetNext will retrieve the oldest entry from the list that is not archived.
@@ -52,12 +49,6 @@ func (p Stapler) GetNext(user *models.User) (*models.Staple, error) {
 // Get retrieves a Staple for a given user with ID.
 func (p Stapler) Get(user *models.User, id string) (*models.Staple, error) {
 	return p.storer.Get(user.Email, id)
-}
-
-// MarkAsRead marks a staple as read.
-func (p Stapler) MarkAsRead(user *models.User, staple models.Staple) error {
-	fmt.Println("Staple Mark as Read called.")
-	return nil
 }
 
 // List lists all staples for a given user.

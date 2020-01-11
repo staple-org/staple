@@ -62,7 +62,6 @@ func Serve() error {
 	g := e.Group(api+"/staple", middleware.JWT([]byte(Opts.GlobalTokenKey)))
 	g.POST("", AddStaple(stapler))
 	g.POST("/:id/archive", AddStaple(stapler))
-	g.POST("/:id/markasread", AddStaple(stapler))
 	g.GET("/:id", GetStaple(stapler))
 	g.GET("/next", GetNext(stapler))
 	g.DELETE("/:id", DeleteStaple(stapler))
