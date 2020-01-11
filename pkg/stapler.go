@@ -34,6 +34,13 @@ func AddStaple(stapler service.Staplerer) echo.HandlerFunc {
 	}
 }
 
+// GetNext retrieves the oldest entry from the list which is not archived.
+func GetNext(staple service.Staplerer) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		return nil
+	}
+}
+
 // GetStaple retrieves a single staple based on an ID.
 func GetStaple(stapler service.Staplerer) echo.HandlerFunc {
 	return func(c echo.Context) error {

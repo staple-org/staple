@@ -15,6 +15,7 @@ type Staplerer interface {
 	Create(staple models.Staple, user *models.User) (err error)
 	Delete(user *models.User, id string) (err error)
 	Get(user *models.User, id string) (staple *models.Staple, err error)
+	GetNext(user *models.User) (staple *models.Staple, err error)
 	MarkAsRead(user *models.User, staple models.Staple) (err error)
 	List(user *models.User) (staples []models.Staple, err error)
 	Archive(user *models.User, staple models.Staple) (err error)
@@ -41,6 +42,11 @@ func (p Stapler) Create(staple models.Staple, user *models.User) error {
 func (p Stapler) Delete(user *models.User, id string) (err error) {
 	fmt.Println("Staple Delete called.")
 	return nil
+}
+
+// GetNext will retrieve the oldest entry from the list that is not archived.
+func (p Stapler) GetNext(user *models.User) (*models.Staple, error) {
+	return p.storer.Oldest(user.Email)
 }
 
 // Get retrieves a Staple for a given user with ID.

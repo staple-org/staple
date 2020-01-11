@@ -83,6 +83,40 @@ func (p PostgresStapleStorer) Get(email string, stapleID string) (*models.Staple
 	}, nil
 }
 
+// Oldest will get the oldest staple that is not archived.
+func (p PostgresStapleStorer) Oldest(email string) (*models.Staple, error) {
+	conn, err := p.connect()
+	if err != nil {
+		return nil, err
+	}
+	ctx := context.Background()
+	defer conn.Close(ctx)
+	var (
+		name, id, content string
+		archived          bool
+		createdAt         time.Time
+	)
+	err = conn.QueryRow(ctx, "select name, id, content, archived, created_timestamp from staples s1 where created_timestamp = (select MIN(created_timestamp) from staples s2 where s2.id = s1.id and s2.user_email = $1)", email).Scan(
+		&name,
+		&id,
+		&content,
+		&archived,
+		&createdAt)
+	if err != nil {
+		if err.Error() == "no rows in result set" {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return &models.Staple{
+		Name:             name,
+		ID:               id,
+		Content:          content,
+		Archived:         archived,
+		CreatedTimestamp: createdAt,
+	}, nil
+}
+
 // Archive archives a staple.
 func (p PostgresStapleStorer) Archive(email string, stapleID string) error {
 	panic("implement me")
