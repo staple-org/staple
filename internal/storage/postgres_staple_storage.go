@@ -34,23 +34,23 @@ func (p PostgresStapleStorer) Create(staple models.Staple, email string) error {
 	}
 	ctx := context.Background()
 	defer conn.Close(ctx)
-	_, err = conn.Exec(ctx, "insert into staples(name, id, content, archived, created_timestamp, username) values($1, $2, $3, $4, $5, $6)",
+	_, err = conn.Exec(ctx, "insert into staples(name, id, content, archived, createdAt, username) values($1, $2, $3, $4, $5, $6)",
 		staple.Name,
 		staple.ID,
 		staple.Content,
 		staple.Archived,
-		staple.CreatedTimestamp,
+		staple.CreatedAt,
 		email)
 	return err
 }
 
 // Delete removes a staple.
-func (p PostgresStapleStorer) Delete(email string, stapleID string) error {
+func (p PostgresStapleStorer) Delete(email string, stapleID int) error {
 	panic("implement me")
 }
 
 // Get retrieves a staple.
-func (p PostgresStapleStorer) Get(email string, stapleID string) (*models.Staple, error) {
+func (p PostgresStapleStorer) Get(email string, stapleID int) (*models.Staple, error) {
 	conn, err := p.connect()
 	if err != nil {
 		return nil, err
@@ -58,11 +58,12 @@ func (p PostgresStapleStorer) Get(email string, stapleID string) (*models.Staple
 	ctx := context.Background()
 	defer conn.Close(ctx)
 	var (
-		name, id, content string
-		archived          bool
-		createdAt         time.Time
+		id            int
+		name, content string
+		archived      bool
+		createdAt     time.Time
 	)
-	err = conn.QueryRow(ctx, "select name, id, content, archived, created_timestamp from staples where user_email = $1 and id = $2", email, stapleID).Scan(
+	err = conn.QueryRow(ctx, "select name, id, content, archived, createdAt from staples where user_email = $1 and id = $2", email, stapleID).Scan(
 		&name,
 		&id,
 		&content,
@@ -75,11 +76,11 @@ func (p PostgresStapleStorer) Get(email string, stapleID string) (*models.Staple
 		return nil, err
 	}
 	return &models.Staple{
-		Name:             name,
-		ID:               id,
-		Content:          content,
-		Archived:         archived,
-		CreatedTimestamp: createdAt,
+		Name:      name,
+		ID:        id,
+		Content:   content,
+		Archived:  archived,
+		CreatedAt: createdAt,
 	}, nil
 }
 
@@ -92,11 +93,12 @@ func (p PostgresStapleStorer) Oldest(email string) (*models.Staple, error) {
 	ctx := context.Background()
 	defer conn.Close(ctx)
 	var (
-		name, id, content string
-		archived          bool
-		createdAt         time.Time
+		id            int
+		name, content string
+		archived      bool
+		createdAt     time.Time
 	)
-	err = conn.QueryRow(ctx, "select name, id, content, archived, created_timestamp from staples s1 where created_timestamp = (select MIN(created_timestamp) from staples s2 where s2.id = s1.id and s2.user_email = $1)", email).Scan(
+	err = conn.QueryRow(ctx, "select name, id, content, archived, createdAt from staples s1 where createdAt = (select MIN(createdAt) from staples s2 where s2.id = s1.id and s2.user_email = $1)", email).Scan(
 		&name,
 		&id,
 		&content,
@@ -109,16 +111,16 @@ func (p PostgresStapleStorer) Oldest(email string) (*models.Staple, error) {
 		return nil, err
 	}
 	return &models.Staple{
-		Name:             name,
-		ID:               id,
-		Content:          content,
-		Archived:         archived,
-		CreatedTimestamp: createdAt,
+		Name:      name,
+		ID:        id,
+		Content:   content,
+		Archived:  archived,
+		CreatedAt: createdAt,
 	}, nil
 }
 
 // Archive archives a staple.
-func (p PostgresStapleStorer) Archive(email string, stapleID string) error {
+func (p PostgresStapleStorer) Archive(email string, stapleID int) error {
 	panic("implement me")
 }
 
@@ -132,14 +134,14 @@ func (p PostgresStapleStorer) List(email string) ([]models.Staple, error) {
 	}
 	ctx := context.Background()
 	defer conn.Close(ctx)
-	rows, err := conn.Query(ctx, "select name, id, archived, created_timestamp from staples where user_email=$1 and archived = false", email)
+	rows, err := conn.Query(ctx, "select name, id, archived, createdAt from staples where user_email=$1 and archived = false", email)
 	if err != nil {
 		return nil, err
 	}
 	ret := make([]models.Staple, 0)
 	for rows.Next() {
 		staple := models.Staple{}
-		err = rows.Scan(&staple.Name, &staple.ID, &staple.Archived, &staple.CreatedTimestamp)
+		err = rows.Scan(&staple.Name, &staple.ID, &staple.Archived, &staple.CreatedAt)
 		if err != nil {
 			return nil, err
 		}

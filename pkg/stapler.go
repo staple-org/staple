@@ -3,6 +3,7 @@ package pkg
 import (
 	"errors"
 	"net/http"
+	"strconv"
 
 	"github.com/dgrijalva/jwt-go"
 
@@ -31,6 +32,7 @@ func AddStaple(stapler service.Staplerer) echo.HandlerFunc {
 			return c.JSON(http.StatusInternalServerError, apiError)
 		}
 
+		// ID needs to be sequential.
 		err = stapler.Create(models.Staple{}, userModel)
 		if err != nil {
 			apiError := ApiError("Unable to create staple for user.", http.StatusInternalServerError, err)
@@ -43,7 +45,26 @@ func AddStaple(stapler service.Staplerer) echo.HandlerFunc {
 // GetNext retrieves the oldest entry from the list which is not archived.
 func GetNext(staple service.Staplerer) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		return nil
+		token, err := GetToken(c)
+		if err != nil {
+			return err
+		}
+		claims := token.Claims.(jwt.MapClaims)
+		email := claims["email"].(string)
+		userModel := &models.User{
+			Email: email,
+		}
+		s, err := staple.GetNext(userModel)
+		if err != nil {
+			apiError := ApiError("failed getting next staple", http.StatusInternalServerError, err)
+			return c.JSON(http.StatusInternalServerError, apiError)
+		}
+		var staple = struct {
+			Staple *models.Staple `json:"staple"`
+		}{
+			Staple: s,
+		}
+		return c.JSON(http.StatusOK, staple)
 	}
 }
 
@@ -63,7 +84,12 @@ func GetStaple(stapler service.Staplerer) echo.HandlerFunc {
 		if id == "" {
 			return errors.New("invalid id")
 		}
-		s, err := stapler.Get(userModel, id)
+		n, err := strconv.Atoi(id)
+		if err != nil {
+			apiError := ApiError("failed to convert id to number", http.StatusInternalServerError, err)
+			return c.JSON(http.StatusInternalServerError, apiError)
+		}
+		s, err := stapler.Get(userModel, n)
 		if err != nil {
 			apiError := ApiError("something went wrong", http.StatusInternalServerError, err)
 			return c.JSON(http.StatusInternalServerError, apiError)
@@ -124,7 +150,12 @@ func DeleteStaple(stapler service.Staplerer) echo.HandlerFunc {
 		if id == "" {
 			return errors.New("invalid id")
 		}
-		err = stapler.Delete(userModel, id)
+		n, err := strconv.Atoi(id)
+		if err != nil {
+			apiError := ApiError("failed to convert id to number", http.StatusInternalServerError, err)
+			return c.JSON(http.StatusInternalServerError, apiError)
+		}
+		err = stapler.Delete(userModel, n)
 		if err != nil {
 			apiError := ApiError("Unable to delete staple.", http.StatusInternalServerError, err)
 			return c.JSON(http.StatusInternalServerError, apiError)

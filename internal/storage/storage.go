@@ -5,10 +5,10 @@ import "github.com/staple-org/staple/internal/models"
 // StapleStorer defines a set of functions for storing staples.
 type StapleStorer interface {
 	Create(staple models.Staple, email string) error
-	Delete(email string, stapleID string) error
-	Get(email string, stapleID string) (*models.Staple, error)
+	Delete(email string, stapleID int) error
+	Get(email string, stapleID int) (*models.Staple, error)
 	List(email string) ([]models.Staple, error)
-	Archive(email string, stapleID string) error
+	Archive(email string, stapleID int) error
 	Oldest(email string) (*models.Staple, error)
 }
 

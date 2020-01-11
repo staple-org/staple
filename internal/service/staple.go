@@ -13,8 +13,8 @@ import (
 // the user's staples.
 type Staplerer interface {
 	Create(staple models.Staple, user *models.User) (err error)
-	Delete(user *models.User, id string) (err error)
-	Get(user *models.User, id string) (staple *models.Staple, err error)
+	Delete(user *models.User, id int) (err error)
+	Get(user *models.User, id int) (staple *models.Staple, err error)
 	GetNext(user *models.User) (staple *models.Staple, err error)
 	List(user *models.User) (staples []models.Staple, err error)
 	Archive(user *models.User, staple models.Staple) (err error)
@@ -37,7 +37,7 @@ func (p Stapler) Create(staple models.Staple, user *models.User) error {
 }
 
 // Delete deletes a given staple for a user.
-func (p Stapler) Delete(user *models.User, id string) (err error) {
+func (p Stapler) Delete(user *models.User, id int) (err error) {
 	return p.storer.Delete(user.Email, id)
 }
 
@@ -47,7 +47,7 @@ func (p Stapler) GetNext(user *models.User) (*models.Staple, error) {
 }
 
 // Get retrieves a Staple for a given user with ID.
-func (p Stapler) Get(user *models.User, id string) (*models.Staple, error) {
+func (p Stapler) Get(user *models.User, id int) (*models.Staple, error) {
 	return p.storer.Get(user.Email, id)
 }
 
