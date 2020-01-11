@@ -23,3 +23,7 @@ clean:
 .PHONY: run
 run:
 	go run cmd/root.go
+
+.PHONY: start-https
+run:
+	go run cmd/root.go --server-key-path ./certs/key.pem --server-crt-path ./certs/cert.pem
