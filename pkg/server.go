@@ -63,7 +63,7 @@ func Serve() error {
 	g.POST("", AddStaple(stapler))
 	g.POST("/:id/archive", AddStaple(stapler))
 	g.POST("/:id/markasread", AddStaple(stapler))
-	g.GET("/:id", AddStaple(stapler))
+	g.GET("/:id", GetStaple(stapler))
 	g.DELETE("/:id", DeleteStaple(stapler))
 	g.GET("", ListStaples(stapler))
 

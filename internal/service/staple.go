@@ -14,7 +14,7 @@ import (
 type Staplerer interface {
 	Create(staple models.Staple, user *models.User) (err error)
 	Delete(user *models.User, id string) (err error)
-	Get(user *models.User, id string) (staple models.Staple, err error)
+	Get(user *models.User, id string) (staple *models.Staple, err error)
 	MarkAsRead(user *models.User, staple models.Staple) (err error)
 	List(user *models.User) (staples []models.Staple, err error)
 	Archive(user *models.User, staple models.Staple) (err error)
@@ -44,9 +44,8 @@ func (p Stapler) Delete(user *models.User, id string) (err error) {
 }
 
 // Get retrieves a Staple for a given user with ID.
-func (p Stapler) Get(user *models.User, id string) (models.Staple, error) {
-	fmt.Println("Staple Get called.")
-	return models.Staple{}, nil
+func (p Stapler) Get(user *models.User, id string) (*models.Staple, error) {
+	return p.storer.Get(user.Email, id)
 }
 
 // MarkAsRead marks a staple as read.

@@ -6,7 +6,7 @@ import "github.com/staple-org/staple/internal/models"
 type StapleStorer interface {
 	Create(staple models.Staple, email string) error
 	Delete(email string, stapleID string) error
-	Get(email string, stapleID string) (models.Staple, error)
+	Get(email string, stapleID string) (*models.Staple, error)
 	List(email string) ([]models.Staple, error)
 	Archive(email string, stapleID string) error
 }

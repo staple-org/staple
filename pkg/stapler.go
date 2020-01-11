@@ -1,6 +1,7 @@
 package pkg
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/dgrijalva/jwt-go"
@@ -26,18 +27,44 @@ func AddStaple(stapler service.Staplerer) echo.HandlerFunc {
 		// TODO: Construct staple here. POST will have the information needed.
 		err = stapler.Create(models.Staple{}, user)
 		if err != nil {
-			var message = struct {
-				Code    int    `json:"code"`
-				Message string `json:"message"`
-				Error   string `json:"error"`
-			}{
-				Code:    http.StatusInternalServerError,
-				Message: "Unable to create staple for user.",
-				Error:   err.Error(),
-			}
-			return c.JSON(http.StatusInternalServerError, message)
+			apiError := ApiError("Unable to create staple for user.", http.StatusInternalServerError, err)
+			return c.JSON(http.StatusInternalServerError, apiError)
 		}
 		return c.NoContent(http.StatusOK)
+	}
+}
+
+// GetStaple retrieves a single staple based on an ID.
+func GetStaple(stapler service.Staplerer) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		token, err := GetToken(c)
+		if err != nil {
+			return err
+		}
+		claims := token.Claims.(jwt.MapClaims)
+		email := claims["email"].(string)
+		userModel := &models.User{
+			Email: email,
+		}
+		id := c.Param("id")
+		if id == "" {
+			return errors.New("invalid id")
+		}
+		s, err := stapler.Get(userModel, id)
+		if err != nil {
+			apiError := ApiError("something went wrong", http.StatusInternalServerError, err)
+			return c.JSON(http.StatusInternalServerError, apiError)
+		}
+		if s == nil {
+			apiError := ApiError("staple not found", http.StatusBadRequest, nil)
+			return c.JSON(http.StatusBadRequest, apiError)
+		}
+		var staple = struct {
+			Staple models.Staple `json:"staple"`
+		}{
+			Staple: *s,
+		}
+		return c.JSON(http.StatusOK, staple)
 	}
 }
 
@@ -55,17 +82,8 @@ func ListStaples(stapler service.Staplerer) echo.HandlerFunc {
 		}
 		s, err := stapler.List(userModel)
 		if err != nil {
-			// Render error page instead
-			var message = struct {
-				Code    int    `json:"code"`
-				Message string `json:"message"`
-				Error   string `json:"error"`
-			}{
-				Code:    http.StatusInternalServerError,
-				Message: "Unable to list staples for user.",
-				Error:   err.Error(),
-			}
-			return c.JSON(http.StatusInternalServerError, message)
+			apiError := ApiError("Unable to list staples for user.", http.StatusInternalServerError, err)
+			return c.JSON(http.StatusInternalServerError, apiError)
 		}
 		var staples = struct {
 			Staples []models.Staple `json:"staples"`

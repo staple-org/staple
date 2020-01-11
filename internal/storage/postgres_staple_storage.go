@@ -3,6 +3,7 @@ package storage
 import (
 	"context"
 	"os"
+	"time"
 
 	"github.com/jackc/pgx/v4"
 
@@ -49,8 +50,37 @@ func (p PostgresStapleStorer) Delete(email string, stapleID string) error {
 }
 
 // Get retrieves a staple.
-func (p PostgresStapleStorer) Get(email string, stapleID string) (models.Staple, error) {
-	panic("implement me")
+func (p PostgresStapleStorer) Get(email string, stapleID string) (*models.Staple, error) {
+	conn, err := p.connect()
+	if err != nil {
+		return nil, err
+	}
+	ctx := context.Background()
+	defer conn.Close(ctx)
+	var (
+		name, id, content string
+		archived          bool
+		createdAt         time.Time
+	)
+	err = conn.QueryRow(ctx, "select name, id, content, archived, created_timestamp from staples where user_email = $1 and id = $2", email, stapleID).Scan(
+		&name,
+		&id,
+		&content,
+		&archived,
+		&createdAt)
+	if err != nil {
+		if err.Error() == "no rows in result set" {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return &models.Staple{
+		Name:             name,
+		ID:               id,
+		Content:          content,
+		Archived:         archived,
+		CreatedTimestamp: createdAt,
+	}, nil
 }
 
 // Archive archives a staple.
