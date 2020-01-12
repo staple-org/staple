@@ -4,9 +4,9 @@ import (
 	"context"
 	"os"
 
-	"github.com/staple-org/staple/internal/models"
-
 	"github.com/jackc/pgx/v4"
+
+	"github.com/staple-org/staple/internal/models"
 )
 
 // PostgresUserStorer is a storer which uses Postgres as a storage backend.
