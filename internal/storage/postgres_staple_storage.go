@@ -104,7 +104,7 @@ func (p PostgresStapleStorer) Oldest(email string) (*models.Staple, error) {
 		archived      bool
 		createdAt     time.Time
 	)
-	err = conn.QueryRow(ctx, "select name, id, content, archived, created_at from staples s1 where created_at = (select MIN(created_at) from staples s2 where s2.id = s1.id and s2.user_email = $1)", email).Scan(
+	err = conn.QueryRow(ctx, "select name, id, content, archived, created_at from staples s1 where created_at = (select MIN(created_at) from staples s2 where s2.id = s1.id and s2.user_email = $1 and s2.archived = false)", email).Scan(
 		&name,
 		&id,
 		&content,

@@ -18,7 +18,7 @@ var Opts = Config{}
 type Message struct {
 	Code    int    `json:"code"`
 	Message string `json:"message"`
-	Error   error  `json:"error"`
+	Error   string `json:"error"`
 }
 
 // ApiError wraps a message and a code into a struct for JSON parsing.
@@ -26,6 +26,6 @@ func ApiError(m string, code int, err error) Message {
 	return Message{
 		Code:    code,
 		Message: m,
-		Error:   err,
+		Error:   err.Error(),
 	}
 }

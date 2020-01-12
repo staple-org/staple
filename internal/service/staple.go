@@ -2,10 +2,17 @@ package service
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/staple-org/staple/internal/models"
 
 	"github.com/staple-org/staple/internal/storage"
+)
+
+const (
+	// MaximumStaples defines the maximum number of staples a user can have
+	// TODO: Make this configurable.
+	MaximumStaples = 25
 )
 
 // Staplerer describes a stapler service which takes care of managing
@@ -31,7 +38,15 @@ func NewStapler(storer storage.StapleStorer) Stapler {
 }
 
 // Create creates a new Staple for the given user.
+// noinspection GoErrorStringFormat
 func (p Stapler) Create(staple models.Staple, user *models.User) error {
+	list, err := p.List(user)
+	if err != nil {
+		return err
+	}
+	if len(list) >= MaximumStaples {
+		return fmt.Errorf("Cannot create more staples than %d. Current count is: %d. Sorry. Read some of your staples first.", MaximumStaples, len(list))
+	}
 	return p.storer.Create(staple, user.Email)
 }
 
