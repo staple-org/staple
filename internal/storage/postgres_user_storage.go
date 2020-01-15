@@ -2,6 +2,7 @@ package storage
 
 import (
 	"context"
+	"log"
 	"os"
 
 	"github.com/jackc/pgx/v4"
@@ -74,6 +75,7 @@ func (s PostgresUserStorer) Update(email string, newUser models.User) error {
 func (s PostgresUserStorer) connect() (*pgx.Conn, error) {
 	conn, err := pgx.Connect(context.Background(), os.Getenv("STAPLE_DATABASE_URL"))
 	if err != nil {
+		log.Println("Failed to connect to database: ", err)
 		return nil, err
 	}
 	return conn, nil
