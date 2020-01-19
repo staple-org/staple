@@ -171,7 +171,7 @@ func (p PostgresStapleStorer) ShowArchive(email string) ([]models.Staple, error)
 	}
 	ctx := context.Background()
 	defer conn.Close(ctx)
-	rows, err := conn.Query(ctx, "select name, id, archived, created_at from staples where user_email=$1 and archived = true ordered by id", email)
+	rows, err := conn.Query(ctx, "select name, id, archived, created_at from staples where user_email=$1 and archived = true order by id", email)
 	if err != nil {
 		return nil, err
 	}

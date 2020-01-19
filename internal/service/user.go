@@ -2,13 +2,17 @@ package service
 
 import (
 	"context"
+	"crypto/rand"
 	"errors"
+	"fmt"
 
 	"golang.org/x/crypto/bcrypt"
 
 	"github.com/staple-org/staple/internal/models"
 	"github.com/staple-org/staple/internal/storage"
 )
+
+const letters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-"
 
 // UserHandlerer defines a service which can manage users.
 type UserHandlerer interface {
@@ -54,7 +58,23 @@ func (u UserHandler) Delete(user models.User) error {
 
 // ResetPassword generates a new password for a user and send it via email.
 func (u UserHandler) ResetPassword(user models.User) error {
-	return nil
+	bytes := make([]byte, 20)
+	_, err := rand.Read(bytes)
+	if err != nil {
+		return err
+	}
+	for i, b := range bytes {
+		bytes[i] = letters[b%byte(len(letters))]
+	}
+	newPassword := string(bytes)
+	hashPassword, err := bcrypt.GenerateFromPassword(bytes, bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println("Actually set newPassword:", hashPassword)
+
+	return SendResetPasswordEmail(user.Email, newPassword)
 }
 
 // IsRegistered checks if a user exists in the system.
