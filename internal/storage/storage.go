@@ -10,6 +10,7 @@ type StapleStorer interface {
 	List(email string) ([]models.Staple, error)
 	Archive(email string, stapleID int) error
 	Oldest(email string) (*models.Staple, error)
+	ShowArchive(email string) ([]models.Staple, error)
 }
 
 // UserStorer defines a set of functions for storing users.

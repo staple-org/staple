@@ -162,3 +162,27 @@ func (p PostgresStapleStorer) List(email string) ([]models.Staple, error) {
 	}
 	return ret, nil
 }
+
+// ShowArchive will return the users archived staples ordered by id.
+func (p PostgresStapleStorer) ShowArchive(email string) ([]models.Staple, error) {
+	conn, err := p.connect()
+	if err != nil {
+		return nil, err
+	}
+	ctx := context.Background()
+	defer conn.Close(ctx)
+	rows, err := conn.Query(ctx, "select name, id, archived, created_at from staples where user_email=$1 and archived = true ordered by id", email)
+	if err != nil {
+		return nil, err
+	}
+	ret := make([]models.Staple, 0)
+	for rows.Next() {
+		staple := models.Staple{}
+		err = rows.Scan(&staple.Name, &staple.ID, &staple.Archived, &staple.CreatedAt)
+		if err != nil {
+			return nil, err
+		}
+		ret = append(ret, staple)
+	}
+	return ret, nil
+}

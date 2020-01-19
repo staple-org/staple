@@ -65,6 +65,7 @@ func Serve() error {
 	g.GET("/:id", GetStaple(stapler))
 	g.GET("/next", GetNext(stapler))
 	g.DELETE("/:id", DeleteStaple(stapler))
+	g.GET("/archive", ShowArchive(stapler))
 	g.GET("", ListStaples(stapler))
 
 	hostPort := fmt.Sprintf("%s:%s", Opts.Hostname, Opts.Port)

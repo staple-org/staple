@@ -135,6 +135,32 @@ func ListStaples(stapler service.Staplerer) echo.HandlerFunc {
 	}
 }
 
+// ShowArchive returns the archived staples of a user.
+func ShowArchive(stapler service.Staplerer) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		token, err := GetToken(c)
+		if err != nil {
+			return err
+		}
+		claims := token.Claims.(jwt.MapClaims)
+		email := claims["email"].(string)
+		userModel := &models.User{
+			Email: email,
+		}
+		s, err := stapler.ShowArchive(userModel)
+		if err != nil {
+			apiError := ApiError("Unable to list staples for user.", http.StatusInternalServerError, err)
+			return c.JSON(http.StatusInternalServerError, apiError)
+		}
+		var staples = struct {
+			Staples []models.Staple `json:"staples"`
+		}{
+			Staples: s,
+		}
+		return c.JSON(http.StatusOK, staples)
+	}
+}
+
 // DeleteStaple deteles a staple with a given ID.
 func DeleteStaple(stapler service.Staplerer) echo.HandlerFunc {
 	return func(c echo.Context) error {

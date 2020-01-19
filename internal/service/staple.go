@@ -24,6 +24,7 @@ type Staplerer interface {
 	GetNext(user *models.User) (staple *models.Staple, err error)
 	List(user *models.User) (staples []models.Staple, err error)
 	Archive(user *models.User, id int) (err error)
+	ShowArchive(use *models.User) ([]models.Staple, error)
 }
 
 // Stapler defines a stapler which stores the staples in Postgres DB.
@@ -78,4 +79,11 @@ func (p Stapler) List(user *models.User) ([]models.Staple, error) {
 // Archived Staples can be retrieved and vewied in any order.
 func (p Stapler) Archive(user *models.User, id int) error {
 	return p.storer.Archive(user.Email, id)
+}
+
+// ShowArchive returns the list of archived staples for a given user.
+// This must support pagination.
+// For now return everything and the frontend will paginate.
+func (p Stapler) ShowArchive(user *models.User) ([]models.Staple, error) {
+	return p.storer.ShowArchive(user.Email)
 }
