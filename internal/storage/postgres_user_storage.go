@@ -69,7 +69,17 @@ func (s PostgresUserStorer) Get(email string) (*models.User, error) {
 
 // Update updates a user with a given email address.
 func (s PostgresUserStorer) Update(email string, newUser models.User) error {
-	panic("implement me")
+	conn, err := s.connect()
+	if err != nil {
+		return err
+	}
+	ctx := context.Background()
+	defer conn.Close(ctx)
+	_, err = conn.Exec(ctx, "update users set email=$1, password=$2 where email=$3",
+		newUser.Email,
+		newUser.Password,
+		email)
+	return err
 }
 
 func (s PostgresUserStorer) connect() (*pgx.Conn, error) {

@@ -48,8 +48,10 @@ func Serve() error {
 	// Register a user.
 	ctx := context.Background()
 	postgresUserStorer := storage.NewPostgresUserStorer()
-	userHandler := service.NewUserHandler(ctx, postgresUserStorer)
+	emailNotifier := service.NewEmailNotifier()
+	userHandler := service.NewUserHandler(ctx, postgresUserStorer, emailNotifier)
 	e.POST("/register", RegisterUser(userHandler))
+	e.POST("/reset", ResetPassword(userHandler))
 	// Generate a token for a given username.
 	e.POST("/get-token", TokenHandler(userHandler))
 

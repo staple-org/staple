@@ -4,7 +4,6 @@ import (
 	"context"
 	"crypto/rand"
 	"errors"
-	"fmt"
 
 	"golang.org/x/crypto/bcrypt"
 
@@ -25,8 +24,9 @@ type UserHandlerer interface {
 
 // UserHandler defines a storage using user handler.
 type UserHandler struct {
-	ctx   context.Context
-	store storage.UserStorer
+	ctx      context.Context
+	store    storage.UserStorer
+	notifier Notifier
 }
 
 // Register registers a user.
@@ -72,9 +72,13 @@ func (u UserHandler) ResetPassword(user models.User) error {
 		return err
 	}
 
-	fmt.Println("Actually set newPassword:", hashPassword)
+	user.Password = string(hashPassword)
+	if err := u.store.Update(user.Email, user); err != nil {
+		return err
+	}
 
-	return SendResetPasswordEmail(user.Email, newPassword)
+	// TODO: Send out a confirm email instead of immediately resetting a user's password.
+	return u.notifier.Notify(user.Email, PasswordReset, newPassword)
 }
 
 // IsRegistered checks if a user exists in the system.
@@ -110,9 +114,10 @@ func (u UserHandler) PasswordMatch(user models.User) (ok bool, err error) {
 }
 
 // NewUserHandler creates a new user handler.
-func NewUserHandler(ctx context.Context, store storage.UserStorer) UserHandler {
+func NewUserHandler(ctx context.Context, store storage.UserStorer, notifier Notifier) UserHandler {
 	return UserHandler{
-		ctx:   ctx,
-		store: store,
+		ctx:      ctx,
+		store:    store,
+		notifier: notifier,
 	}
 }
