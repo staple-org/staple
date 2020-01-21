@@ -53,10 +53,11 @@ func Serve() error {
 	emailNotifier := service.NewEmailNotifier()
 	userHandler := service.NewUserHandler(ctx, postgresUserStorer, emailNotifier)
 	e.POST("/register", RegisterUser(userHandler))
-	e.POST("/reset", ResetPassword(userHandler))
 	// Generate a token for a given username.
 	e.POST("/get-token", TokenHandler(userHandler))
-	// Verfiy confirm link
+
+	// Reset Password Flow
+	e.POST("/reset", ResetPassword(userHandler))
 	e.POST("/verify", VerfiyConfirmCode(userHandler))
 
 	api := "/rest/api/1"
@@ -73,6 +74,9 @@ func Serve() error {
 	g.DELETE("/:id", DeleteStaple(stapler))
 	g.GET("/archive", ShowArchive(stapler))
 	g.GET("", ListStaples(stapler))
+
+	//u := e.Group(api+"/user", middleware.JWT([]byte(config.Opts.GlobalTokenKey)))
+	//u.POST("/change-password")
 
 	hostPort := fmt.Sprintf("%s:%s", config.Opts.Hostname, config.Opts.Port)
 	// Start TLS with certificate paths

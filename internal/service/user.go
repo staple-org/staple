@@ -90,11 +90,16 @@ func (u UserHandler) SendConfirmCode(user models.User) error {
 	if err != nil {
 		return err
 	}
-	user.ConfirmCode = confirmUUID.String()
-	if err := u.store.Update(user.Email, user); err != nil {
+	storedUser, err := u.store.Get(user.Email)
+	if err != nil {
 		return err
 	}
-	return u.notifier.Notify(user.Email, GenerateConfirmCode, user.ConfirmCode)
+
+	storedUser.ConfirmCode = confirmUUID.String()
+	if err := u.store.Update(storedUser.Email, *storedUser); err != nil {
+		return err
+	}
+	return u.notifier.Notify(storedUser.Email, GenerateConfirmCode, storedUser.ConfirmCode)
 }
 
 // VerifyConfirmCode will match the confirm code with a stored code for an email address.

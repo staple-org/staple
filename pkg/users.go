@@ -1,6 +1,7 @@
 package pkg
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/staple-org/staple/pkg/config"
@@ -29,6 +30,7 @@ func RegisterUser(userHandler service.UserHandlerer) echo.HandlerFunc {
 				"message": "User already registered.",
 			})
 		} else if err != nil {
+			log.Println("[ERROR] During registration flow: ", err)
 			return c.JSON(http.StatusInternalServerError, map[string]string{
 				"error": err.Error(),
 			})
@@ -40,10 +42,10 @@ func RegisterUser(userHandler service.UserHandlerer) echo.HandlerFunc {
 // ResetPassword takes a user handler and resets a user's password delievered from the token.
 func ResetPassword(userHandler service.UserHandlerer) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		// Get the nickname for the token.
 		user := &models.User{}
 		err := c.Bind(user)
 		if err != nil {
+			log.Println("[ERROR] Failed binding user: ", err)
 			return err
 		}
 		if user.Email == "" {
@@ -60,7 +62,13 @@ func ResetPassword(userHandler service.UserHandlerer) echo.HandlerFunc {
 				"error": err.Error(),
 			})
 		}
-		return userHandler.ResetPassword(*user)
+		return userHandler.SendConfirmCode(*user)
+	}
+}
+
+func ChangePassword(userHandler service.UserHandlerer) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		return nil
 	}
 }
 

@@ -26,9 +26,10 @@ func (s PostgresUserStorer) Create(email string, password []byte) error {
 	}
 	ctx := context.Background()
 	defer conn.Close(ctx)
-	_, err = conn.Exec(ctx, "insert into users(email, password) values($1, $2)",
+	_, err = conn.Exec(ctx, "insert into users(email, password, confirm_code) values($1, $2, $3)",
 		email,
-		password)
+		password,
+		"")
 	return err
 }
 
