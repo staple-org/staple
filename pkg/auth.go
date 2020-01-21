@@ -7,6 +7,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/staple-org/staple/pkg/config"
+
 	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo/v4"
 
@@ -55,7 +57,7 @@ func TokenHandler(userHandler service.UserHandlerer) echo.HandlerFunc {
 		claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
 
 		// Generate encoded token and send it as response.
-		t, err := token.SignedString([]byte(Opts.GlobalTokenKey))
+		t, err := token.SignedString([]byte(config.Opts.GlobalTokenKey))
 		if err != nil {
 			return err
 		}
@@ -80,7 +82,7 @@ func GetToken(c echo.Context) (*jwt.Token, error) {
 		signingMethodError := fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		switch token.Method.(type) {
 		case *jwt.SigningMethodHMAC:
-			return []byte(Opts.GlobalTokenKey), nil
+			return []byte(config.Opts.GlobalTokenKey), nil
 		default:
 			return nil, signingMethodError
 		}

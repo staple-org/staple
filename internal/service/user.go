@@ -21,8 +21,8 @@ type UserHandlerer interface {
 	ResetPassword(user models.User) error
 	IsRegistered(user models.User) (ok bool, err error)
 	PasswordMatch(user models.User) (ok bool, err error)
-	SendConfirmLink(user models.User) (string, error)
-	VerifyConfirmLink(user models.User) (bool, error)
+	SendConfirmCode(user models.User) error
+	VerifyConfirmCode(user models.User) (bool, error)
 }
 
 // UserHandler defines a storage using user handler.
@@ -60,6 +60,7 @@ func (u UserHandler) Delete(user models.User) error {
 }
 
 // ResetPassword generates a new password for a user and send it via email.
+// This happens after the confirmation was successfull.
 func (u UserHandler) ResetPassword(user models.User) error {
 	bytes := make([]byte, 20)
 	_, err := rand.Read(bytes)
@@ -80,27 +81,25 @@ func (u UserHandler) ResetPassword(user models.User) error {
 		return err
 	}
 
-	// TODO: Send out a confirm email instead of immediately resetting a user's password.
 	return u.notifier.Notify(user.Email, PasswordReset, newPassword)
 }
 
-// SendConfirmLink sends a confirm link to the user.
-func (u UserHandler) SendConfirmLink(user models.User) (string, error) {
+// SendConfirmCode sends a confirm code which has to be verified.
+func (u UserHandler) SendConfirmCode(user models.User) error {
 	confirmUUID, err := uuid.NewUUID()
 	if err != nil {
-		return "", err
+		return err
 	}
-
-	user.ConfirmLink = confirmUUID.String()
+	user.ConfirmCode = confirmUUID.String()
 	if err := u.store.Update(user.Email, user); err != nil {
-		return "", err
+		return err
 	}
-
-	return confirmUUID.String(), nil
+	return u.notifier.Notify(user.Email, GenerateConfirmCode, user.ConfirmCode)
 }
 
-// PasswordMatch checks if a stored password matches that of a given one.
-func (u UserHandler) VerifyConfirmLink(user models.User) (ok bool, err error) {
+// VerifyConfirmCode will match the confirm code with a stored code for an email address.
+// If the match is successful the code is removed and the password is reset.
+func (u UserHandler) VerifyConfirmCode(user models.User) (ok bool, err error) {
 	storedUser, err := u.store.Get(user.Email)
 	if err != nil {
 		return false, err
@@ -108,7 +107,18 @@ func (u UserHandler) VerifyConfirmLink(user models.User) (ok bool, err error) {
 	if storedUser == nil {
 		return false, errors.New("user not found")
 	}
-	return user.ConfirmLink == storedUser.ConfirmLink, nil
+	if user.ConfirmCode == storedUser.ConfirmCode && user.Email == storedUser.Email {
+		// Remove the confirm code.
+		if err := u.store.Update(user.Email, user); err != nil {
+			return false, err
+		}
+		if err := u.ResetPassword(user); err != nil {
+			return false, err
+		}
+		// Send password reset email.
+		return true, nil
+	}
+	return false, errors.New("confirm code did not match")
 }
 
 // IsRegistered checks if a user exists in the system.

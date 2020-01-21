@@ -6,6 +6,6 @@ type User struct {
 	Email string `json:"email"`
 	// Password
 	Password string `json:"password"`
-	// Confirm link -- ignore in json
-	ConfirmLink string `json:"-"`
+	// Confirm code -- ignore in json
+	ConfirmCode string `json:"-"`
 }

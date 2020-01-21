@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/staple-org/staple/pkg/config"
+
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"golang.org/x/crypto/acme/autocert"
@@ -24,7 +26,7 @@ func Serve() error {
 	// Register the template renderer
 
 	// Setup Global Token Key
-	if Opts.GlobalTokenKey == "" {
+	if config.Opts.GlobalTokenKey == "" {
 		log.Print("Please set a global secret key... Randomly generating one for now...")
 		b := make([]byte, 32)
 		_, err := rand.Read(b)
@@ -32,7 +34,7 @@ func Serve() error {
 			return err
 		}
 		state := base64.StdEncoding.EncodeToString(b)
-		Opts.GlobalTokenKey = state
+		config.Opts.GlobalTokenKey = state
 		log.Println("done.")
 	}
 
@@ -55,7 +57,7 @@ func Serve() error {
 	// Generate a token for a given username.
 	e.POST("/get-token", TokenHandler(userHandler))
 	// Verfiy confirm link
-	e.GET("/verify/:link:email", VerfiyConfirmLink(userHandler))
+	e.POST("/verify", VerfiyConfirmCode(userHandler))
 
 	api := "/rest/api/1"
 	//gob.Register(map[string]interface{}{})
@@ -63,7 +65,7 @@ func Serve() error {
 	stapler := service.NewStapler(postgresStapleStorer)
 
 	// REST api group
-	g := e.Group(api+"/staple", middleware.JWT([]byte(Opts.GlobalTokenKey)))
+	g := e.Group(api+"/staple", middleware.JWT([]byte(config.Opts.GlobalTokenKey)))
 	g.POST("", AddStaple(stapler))
 	g.POST("/:id/archive", ArchiveStaple(stapler))
 	g.GET("/:id", GetStaple(stapler))
@@ -72,20 +74,20 @@ func Serve() error {
 	g.GET("/archive", ShowArchive(stapler))
 	g.GET("", ListStaples(stapler))
 
-	hostPort := fmt.Sprintf("%s:%s", Opts.Hostname, Opts.Port)
+	hostPort := fmt.Sprintf("%s:%s", config.Opts.Hostname, config.Opts.Port)
 	// Start TLS with certificate paths
-	if len(Opts.ServerKeyPath) > 0 && len(Opts.ServerCrtPath) > 0 {
+	if len(config.Opts.ServerKeyPath) > 0 && len(config.Opts.ServerCrtPath) > 0 {
 		e.Pre(middleware.HTTPSRedirect())
-		return e.StartTLS(hostPort, Opts.ServerCrtPath, Opts.ServerKeyPath)
+		return e.StartTLS(hostPort, config.Opts.ServerCrtPath, config.Opts.ServerKeyPath)
 	}
 
 	// Start Auto TLS server
-	if Opts.AutoTLS {
-		if len(Opts.CacheDir) < 1 {
+	if config.Opts.AutoTLS {
+		if len(config.Opts.CacheDir) < 1 {
 			return errors.New("cache dir must be provided if autoTLS is enabled")
 		}
 		e.Pre(middleware.HTTPSRedirect())
-		e.AutoTLSManager.Cache = autocert.DirCache(Opts.CacheDir)
+		e.AutoTLSManager.Cache = autocert.DirCache(config.Opts.CacheDir)
 		return e.StartAutoTLS(hostPort)
 	}
 	// Start regular server
