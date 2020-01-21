@@ -56,15 +56,16 @@ func (s PostgresUserStorer) Get(email string) (*models.User, error) {
 	var (
 		storedEmail string
 		password    []byte
+		confirmLink string
 	)
-	err = conn.QueryRow(ctx, "select email, password from users where email = $1", email).Scan(&storedEmail, &password)
+	err = conn.QueryRow(ctx, "select email, password, confirm_link from users where email = $1", email).Scan(&storedEmail, &password, &confirmLink)
 	if err != nil {
 		if err.Error() == "no rows in result set" {
 			return nil, nil
 		}
 		return nil, err
 	}
-	return &models.User{Email: storedEmail, Password: string(password)}, nil
+	return &models.User{Email: storedEmail, Password: string(password), ConfirmLink: confirmLink}, nil
 }
 
 // Update updates a user with a given email address.
@@ -75,9 +76,10 @@ func (s PostgresUserStorer) Update(email string, newUser models.User) error {
 	}
 	ctx := context.Background()
 	defer conn.Close(ctx)
-	_, err = conn.Exec(ctx, "update users set email=$1, password=$2 where email=$3",
+	_, err = conn.Exec(ctx, "update users set email=$1, password=$2, confirm_link=$3 where email=$4",
 		newUser.Email,
 		newUser.Password,
+		newUser.ConfirmLink,
 		email)
 	return err
 }

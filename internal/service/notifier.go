@@ -19,6 +19,8 @@ type Payload string
 var (
 	// PasswordReset is an event that happens when the user's password is reset.
 	PasswordReset Event = "Password Reset"
+	// SendConfirmLink is an event before password reset which sends a confirm link to the user.
+	GenerateConfirmLink Event = "Confirm Link"
 )
 
 // Notifier notifies the user of some event.
@@ -39,6 +41,8 @@ var (
 	mgAPIKey              = os.Getenv("STAPLE_MG_API_KEY")
 	passwordResetTemplate = `Dear %s
 Your password has been successfully reset to: %s. Please change as soon as possible.`
+	confirmEmailTemplate = `Dear %s
+Please follow this link if this reset was requested by you: %s`
 )
 
 // Notify attempts to send out an email using mailgun contaning the new password.
@@ -47,6 +51,8 @@ func (e EmailNotifier) Notify(email string, event Event, payload string) error {
 	switch event {
 	case PasswordReset:
 		body = fmt.Sprintf(passwordResetTemplate, email, payload)
+	case GenerateConfirmLink:
+		body = fmt.Sprintf(confirmEmailTemplate, email, payload)
 	}
 
 	mg := mailgun.NewMailgun(domain, mgAPIKey)

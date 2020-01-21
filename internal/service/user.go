@@ -5,6 +5,7 @@ import (
 	"crypto/rand"
 	"errors"
 
+	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 
 	"github.com/staple-org/staple/internal/models"
@@ -20,6 +21,8 @@ type UserHandlerer interface {
 	ResetPassword(user models.User) error
 	IsRegistered(user models.User) (ok bool, err error)
 	PasswordMatch(user models.User) (ok bool, err error)
+	SendConfirmLink(user models.User) (string, error)
+	VerifyConfirmLink(user models.User) (bool, error)
 }
 
 // UserHandler defines a storage using user handler.
@@ -79,6 +82,33 @@ func (u UserHandler) ResetPassword(user models.User) error {
 
 	// TODO: Send out a confirm email instead of immediately resetting a user's password.
 	return u.notifier.Notify(user.Email, PasswordReset, newPassword)
+}
+
+// SendConfirmLink sends a confirm link to the user.
+func (u UserHandler) SendConfirmLink(user models.User) (string, error) {
+	confirmUUID, err := uuid.NewUUID()
+	if err != nil {
+		return "", err
+	}
+
+	user.ConfirmLink = confirmUUID.String()
+	if err := u.store.Update(user.Email, user); err != nil {
+		return "", err
+	}
+
+	return confirmUUID.String(), nil
+}
+
+// PasswordMatch checks if a stored password matches that of a given one.
+func (u UserHandler) VerifyConfirmLink(user models.User) (ok bool, err error) {
+	storedUser, err := u.store.Get(user.Email)
+	if err != nil {
+		return false, err
+	}
+	if storedUser == nil {
+		return false, errors.New("user not found")
+	}
+	return user.ConfirmLink == storedUser.ConfirmLink, nil
 }
 
 // IsRegistered checks if a user exists in the system.

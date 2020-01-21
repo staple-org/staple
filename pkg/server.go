@@ -54,6 +54,8 @@ func Serve() error {
 	e.POST("/reset", ResetPassword(userHandler))
 	// Generate a token for a given username.
 	e.POST("/get-token", TokenHandler(userHandler))
+	// Verfiy confirm link
+	e.GET("/verify/:link:email", VerfiyConfirmLink(userHandler))
 
 	api := "/rest/api/1"
 	//gob.Register(map[string]interface{}{})
