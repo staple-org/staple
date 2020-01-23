@@ -2,8 +2,9 @@ package storage
 
 import (
 	"context"
-	"os"
 	"time"
+
+	"github.com/staple-org/staple/pkg/config"
 
 	"github.com/jackc/pgx/v4"
 
@@ -19,7 +20,7 @@ func NewPostgresStapleStorer() PostgresStapleStorer {
 }
 
 func (p PostgresStapleStorer) connect() (*pgx.Conn, error) {
-	conn, err := pgx.Connect(context.Background(), os.Getenv("STAPLE_DATABASE_URL"))
+	conn, err := pgx.Connect(context.Background(), config.Opts.Database.ConnectionURL)
 	if err != nil {
 		return nil, err
 	}

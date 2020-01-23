@@ -9,12 +9,6 @@ import (
 	"github.com/staple-org/staple/internal/storage"
 )
 
-const (
-	// MaximumStaples defines the maximum number of staples a user can have
-	// TODO: Make this configurable.
-	MaximumStaples = 25
-)
-
 // Staplerer describes a stapler service which takes care of managing
 // the user's staples.
 type Staplerer interface {

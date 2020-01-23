@@ -3,8 +3,9 @@ package service
 import (
 	"fmt"
 	"log"
-	"os"
 	"time"
+
+	"github.com/staple-org/staple/pkg/config"
 
 	"github.com/mailgun/mailgun-go"
 )
@@ -37,8 +38,8 @@ func NewEmailNotifier() EmailNotifier {
 }
 
 var (
-	domain                = os.Getenv("STAPLE_MG_DOMAIN")
-	mgAPIKey              = os.Getenv("STAPLE_MG_API_KEY")
+	domain                = config.Opts.Mailer.Domain
+	mgAPIKey              = config.Opts.Mailer.ApiKey
 	passwordResetTemplate = `Dear %s
 Your password has been successfully reset to: %s. Please change as soon as possible.`
 	confirmCodeTemplate = `Dear %s

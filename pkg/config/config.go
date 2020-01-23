@@ -2,7 +2,7 @@ package config
 
 import "errors"
 
-// Config contains configuration options for the inner server of Beemo.
+// Config contains configuration options for the inner server of Staple.
 type Config struct {
 	AutoTLS        bool
 	CacheDir       string
@@ -11,9 +11,16 @@ type Config struct {
 	Port           string
 	Hostname       string
 	GlobalTokenKey string
+	Database       struct {
+		ConnectionURL string
+	}
+	Mailer struct {
+		Domain string
+		ApiKey string
+	}
 }
 
-// Opts represents server side configuration for Beemo.
+// Opts represents server side configuration for Staple.
 var Opts = Config{}
 
 // Message represents an error message.
