@@ -67,7 +67,7 @@ func Serve() error {
 
 	// REST api group
 	g := e.Group(api+"/staple", middleware.JWT([]byte(config.Opts.GlobalTokenKey)))
-	g.POST("", AddStaple(stapler))
+	g.POST("", AddStaple(stapler, userHandler))
 	g.POST("/:id/archive", ArchiveStaple(stapler))
 	g.GET("/:id", GetStaple(stapler))
 	g.GET("/next", GetNext(stapler))
@@ -75,8 +75,10 @@ func Serve() error {
 	g.GET("/archive", ShowArchive(stapler))
 	g.GET("", ListStaples(stapler))
 
-	//u := e.Group(api+"/user", middleware.JWT([]byte(config.Opts.GlobalTokenKey)))
-	//u.POST("/change-password")
+	u := e.Group(api+"/user", middleware.JWT([]byte(config.Opts.GlobalTokenKey)))
+	u.POST("/change-password", ChangePassword(userHandler))
+	u.POST("/max-staples", SetMaximumStaples(userHandler))
+	u.GET("/max-staples", GetMaximumStaples(userHandler))
 
 	hostPort := fmt.Sprintf("%s:%s", config.Opts.Hostname, config.Opts.Port)
 	// Start TLS with certificate paths

@@ -10,6 +10,11 @@ import (
 	"github.com/staple-org/staple/internal/models"
 )
 
+const (
+	// DefaultMaxStaples is 25.
+	DefaultMaxStaples = 25
+)
+
 // PostgresUserStorer is a storer which uses Postgres as a storage backend.
 type PostgresUserStorer struct{}
 
@@ -26,10 +31,11 @@ func (s PostgresUserStorer) Create(email string, password []byte) error {
 	}
 	ctx := context.Background()
 	defer conn.Close(ctx)
-	_, err = conn.Exec(ctx, "insert into users(email, password, confirm_code) values($1, $2, $3)",
+	_, err = conn.Exec(ctx, "insert into users(email, password, confirm_code, max_staples) values($1, $2, $3, $4)",
 		email,
 		password,
-		"")
+		"",
+		DefaultMaxStaples)
 	return err
 }
 
@@ -58,15 +64,20 @@ func (s PostgresUserStorer) Get(email string) (*models.User, error) {
 		storedEmail string
 		password    []byte
 		confirmCode string
+		maxStaples  int
 	)
-	err = conn.QueryRow(ctx, "select email, password, confirm_code from users where email = $1", email).Scan(&storedEmail, &password, &confirmCode)
+	err = conn.QueryRow(ctx, "select email, password, confirm_code, max_staples from users where email = $1", email).Scan(&storedEmail, &password, &confirmCode, &maxStaples)
 	if err != nil {
 		if err.Error() == "no rows in result set" {
 			return nil, nil
 		}
 		return nil, err
 	}
-	return &models.User{Email: storedEmail, Password: string(password), ConfirmCode: confirmCode}, nil
+	return &models.User{
+		Email:       storedEmail,
+		Password:    string(password),
+		ConfirmCode: confirmCode,
+		MaxStaples:  maxStaples}, nil
 }
 
 // Update updates a user with a given email address.
@@ -77,10 +88,11 @@ func (s PostgresUserStorer) Update(email string, newUser models.User) error {
 	}
 	ctx := context.Background()
 	defer conn.Close(ctx)
-	_, err = conn.Exec(ctx, "update users set email=$1, password=$2, confirm_code=$3 where email=$4",
+	_, err = conn.Exec(ctx, "update users set email=$1, password=$2, confirm_code=$3, max_staples=$4 where email=$5",
 		newUser.Email,
 		newUser.Password,
 		newUser.ConfirmCode,
+		newUser.MaxStaples,
 		email)
 	return err
 }

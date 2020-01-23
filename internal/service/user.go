@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/rand"
 	"errors"
+	"log"
 
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
@@ -23,6 +24,9 @@ type UserHandlerer interface {
 	PasswordMatch(user models.User) (ok bool, err error)
 	SendConfirmCode(user models.User) error
 	VerifyConfirmCode(user models.User) (bool, error)
+	SetMaximumStaples(user models.User, maxStaples int) error
+	GetMaximumStaples(user models.User) (int, error)
+	ChangePassword(user models.User, newPassword string) error
 }
 
 // UserHandler defines a storage using user handler.
@@ -77,6 +81,7 @@ func (u UserHandler) ResetPassword(user models.User) error {
 	}
 
 	user.Password = string(hashPassword)
+	user.ConfirmCode = ""
 	if err := u.store.Update(user.Email, user); err != nil {
 		return err
 	}
@@ -113,14 +118,9 @@ func (u UserHandler) VerifyConfirmCode(user models.User) (ok bool, err error) {
 		return false, errors.New("user not found")
 	}
 	if user.ConfirmCode == storedUser.ConfirmCode && user.Email == storedUser.Email {
-		// Remove the confirm code.
-		if err := u.store.Update(user.Email, user); err != nil {
-			return false, err
-		}
 		if err := u.ResetPassword(user); err != nil {
 			return false, err
 		}
-		// Send password reset email.
 		return true, nil
 	}
 	return false, errors.New("confirm code did not match")
@@ -156,6 +156,56 @@ func (u UserHandler) PasswordMatch(user models.User) (ok bool, err error) {
 		return false, err
 	}
 	return true, nil
+}
+
+// SetMaximumStaples sets the user's maximum number of allowed staples.
+func (u UserHandler) SetMaximumStaples(user models.User, maxStaples int) error {
+	if maxStaples <= 0 || maxStaples > 100 {
+		return errors.New("invalid staple setting")
+	}
+	storedUser, err := u.store.Get(user.Email)
+	if err != nil {
+		return err
+	}
+	storedUser.MaxStaples = maxStaples
+	if err := u.store.Update(user.Email, *storedUser); err != nil {
+		return err
+	}
+	return nil
+}
+
+// ChangePassword changes the user's password to a new given string.
+func (u UserHandler) ChangePassword(user models.User, newPassword string) error {
+	if newPassword == "" {
+		return errors.New("password cannot be empty")
+	}
+	storedUser, err := u.store.Get(user.Email)
+	if err != nil {
+		log.Println("Error while getting user: ", err)
+		return err
+	}
+	hashPassword, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+	storedUser.Password = string(hashPassword)
+	if err := u.store.Update(user.Email, *storedUser); err != nil {
+		log.Println("Error while storing user: ", err)
+		return err
+	}
+	return nil
+}
+
+// GetMaximumStaples returns the maximum allowed configured staples for a user.
+func (u UserHandler) GetMaximumStaples(user models.User) (staples int, err error) {
+	storedUser, err := u.store.Get(user.Email)
+	if err != nil {
+		return 0, err
+	}
+	if storedUser == nil {
+		return 0, nil
+	}
+	return storedUser.MaxStaples, nil
 }
 
 // NewUserHandler creates a new user handler.

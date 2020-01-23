@@ -8,4 +8,6 @@ type User struct {
 	Password string `json:"password"`
 	// Confirm code -- ignore in json
 	ConfirmCode string `json:"-"`
+	// Maximum number of staples
+	MaxStaples int `json:"max_staples"`
 }

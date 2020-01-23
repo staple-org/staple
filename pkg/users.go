@@ -3,6 +3,9 @@ package pkg
 import (
 	"log"
 	"net/http"
+	"strconv"
+
+	"github.com/dgrijalva/jwt-go"
 
 	"github.com/staple-org/staple/pkg/config"
 
@@ -66,9 +69,102 @@ func ResetPassword(userHandler service.UserHandlerer) echo.HandlerFunc {
 	}
 }
 
+// ChangePassword let's the user change the account's password.
 func ChangePassword(userHandler service.UserHandlerer) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		return nil
+		token, err := GetToken(c)
+		if err != nil {
+			return err
+		}
+		claims := token.Claims.(jwt.MapClaims)
+		email := claims["email"].(string)
+		userModel := &models.User{
+			Email: email,
+		}
+
+		var password = struct {
+			Password string `json:"password"`
+		}{}
+		err = c.Bind(&password)
+		if err != nil {
+			return err
+		}
+		if password.Password == "" {
+			apiError := config.ApiError("password is empty", http.StatusBadRequest, nil)
+			return c.JSON(http.StatusBadRequest, apiError)
+		}
+		err = userHandler.ChangePassword(*userModel, password.Password)
+		if err != nil {
+			apiError := config.ApiError("failed to change password", http.StatusInternalServerError, nil)
+			return c.JSON(http.StatusInternalServerError, apiError)
+		}
+		return c.NoContent(http.StatusOK)
+	}
+}
+
+// SetMaximumStaples let's the user change the maximum number of staples.
+func SetMaximumStaples(userHandler service.UserHandlerer) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		token, err := GetToken(c)
+		if err != nil {
+			return err
+		}
+		claims := token.Claims.(jwt.MapClaims)
+		email := claims["email"].(string)
+		userModel := &models.User{
+			Email: email,
+		}
+
+		var maxStaples = struct {
+			Staples string `json:"max_staples"`
+		}{}
+		err = c.Bind(&maxStaples)
+		if err != nil {
+			return err
+		}
+		stapleCount, err := strconv.Atoi(maxStaples.Staples)
+		if err != nil {
+			apiError := config.ApiError("failed to convert staple to string", http.StatusBadRequest, err)
+			return c.JSON(http.StatusBadRequest, apiError)
+		}
+		if stapleCount <= 0 || stapleCount > 100 {
+			apiError := config.ApiError("invalid staple setting", http.StatusBadRequest, nil)
+			return c.JSON(http.StatusBadRequest, apiError)
+		}
+		err = userHandler.SetMaximumStaples(*userModel, stapleCount)
+		if err != nil {
+			apiError := config.ApiError("failed to set maximum staples", http.StatusInternalServerError, nil)
+			return c.JSON(http.StatusInternalServerError, apiError)
+		}
+		return c.NoContent(http.StatusOK)
+	}
+}
+
+// GetMaximumStaples returns the user's maximum staple count.
+func GetMaximumStaples(userHandler service.UserHandlerer) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		token, err := GetToken(c)
+		if err != nil {
+			return err
+		}
+		claims := token.Claims.(jwt.MapClaims)
+		email := claims["email"].(string)
+		userModel := &models.User{
+			Email: email,
+		}
+		staples, err := userHandler.GetMaximumStaples(*userModel)
+		if err != nil {
+			apiError := config.ApiError("failed to get maximum staples", http.StatusInternalServerError, nil)
+			return c.JSON(http.StatusInternalServerError, apiError)
+		}
+
+		var maxStaples = struct {
+			Staples string `json:"max_staples"`
+		}{
+			Staples: strconv.Itoa(staples),
+		}
+
+		return c.JSON(http.StatusOK, maxStaples)
 	}
 }
 

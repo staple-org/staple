@@ -18,7 +18,7 @@ import (
 // AddStaple creates a staple using a stapler and a given user.
 // The following properties are enough:
 // name, content
-func AddStaple(stapler service.Staplerer) echo.HandlerFunc {
+func AddStaple(stapler service.Staplerer, userHandler service.UserHandlerer) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		token, err := GetToken(c)
 		if err != nil {
@@ -29,6 +29,12 @@ func AddStaple(stapler service.Staplerer) echo.HandlerFunc {
 		userModel := &models.User{
 			Email: email,
 		}
+		maximumStaples, err := userHandler.GetMaximumStaples(*userModel)
+		if err != nil {
+			apiError := config.ApiError("failed to get maximum staples for user", http.StatusInternalServerError, err)
+			return c.JSON(http.StatusInternalServerError, apiError)
+		}
+		userModel.MaxStaples = maximumStaples
 		staple := &models.Staple{}
 		err = c.Bind(staple)
 		if err != nil {
@@ -36,7 +42,6 @@ func AddStaple(stapler service.Staplerer) echo.HandlerFunc {
 			return c.JSON(http.StatusInternalServerError, apiError)
 		}
 		staple.CreatedAt = time.Now().UTC()
-		// ID needs to be sequential.
 		err = stapler.Create(*staple, userModel)
 		if err != nil {
 			apiError := config.ApiError("Unable to create staple for user.", http.StatusInternalServerError, err)
