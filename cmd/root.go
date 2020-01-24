@@ -4,9 +4,8 @@ import (
 	"flag"
 	"log"
 
-	"github.com/staple-org/staple/pkg/config"
-
 	"github.com/staple-org/staple/pkg"
+	"github.com/staple-org/staple/pkg/config"
 )
 
 func init() {

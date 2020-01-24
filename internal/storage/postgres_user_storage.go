@@ -5,9 +5,9 @@ import (
 	"log"
 
 	"github.com/jackc/pgx/v4"
-	"github.com/staple-org/staple/pkg/config"
 
 	"github.com/staple-org/staple/internal/models"
+	"github.com/staple-org/staple/pkg/config"
 )
 
 const (

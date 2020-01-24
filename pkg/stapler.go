@@ -6,13 +6,12 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/staple-org/staple/pkg/config"
-
 	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo/v4"
 
 	"github.com/staple-org/staple/internal/models"
 	"github.com/staple-org/staple/internal/service"
+	"github.com/staple-org/staple/pkg/config"
 )
 
 // AddStaple creates a staple using a stapler and a given user.

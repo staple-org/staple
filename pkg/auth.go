@@ -7,13 +7,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/staple-org/staple/pkg/config"
-
 	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo/v4"
 
 	"github.com/staple-org/staple/internal/models"
 	"github.com/staple-org/staple/internal/service"
+	"github.com/staple-org/staple/pkg/config"
 )
 
 // TokenHandler creates a JWT token for a given user.

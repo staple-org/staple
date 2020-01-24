@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/staple-org/staple/internal/models"
-
 	"github.com/staple-org/staple/internal/storage"
 )
 

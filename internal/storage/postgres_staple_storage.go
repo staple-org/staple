@@ -4,11 +4,10 @@ import (
 	"context"
 	"time"
 
-	"github.com/staple-org/staple/pkg/config"
-
 	"github.com/jackc/pgx/v4"
 
 	"github.com/staple-org/staple/internal/models"
+	"github.com/staple-org/staple/pkg/config"
 )
 
 // PostgresStapleStorer is a storer which uses Postgres as a storage backend.

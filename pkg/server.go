@@ -8,14 +8,13 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/staple-org/staple/pkg/config"
-
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"golang.org/x/crypto/acme/autocert"
 
 	"github.com/staple-org/staple/internal/service"
 	"github.com/staple-org/staple/internal/storage"
+	"github.com/staple-org/staple/pkg/config"
 )
 
 // Serve starts the Stapler API server.

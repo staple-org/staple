@@ -6,12 +6,11 @@ import (
 	"strconv"
 
 	"github.com/dgrijalva/jwt-go"
-
-	"github.com/staple-org/staple/pkg/config"
-
 	"github.com/labstack/echo/v4"
+
 	"github.com/staple-org/staple/internal/models"
 	"github.com/staple-org/staple/internal/service"
+	"github.com/staple-org/staple/pkg/config"
 )
 
 // RegisterUser takes a storer and creates a user entry.

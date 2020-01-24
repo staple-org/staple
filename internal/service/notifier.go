@@ -5,9 +5,9 @@ import (
 	"log"
 	"time"
 
-	"github.com/staple-org/staple/pkg/config"
-
 	"github.com/mailgun/mailgun-go"
+
+	"github.com/staple-org/staple/pkg/config"
 )
 
 // Event represents an event that can happen which needs the user's attention via
