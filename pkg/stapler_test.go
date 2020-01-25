@@ -35,7 +35,7 @@ func TestListStaples(t *testing.T) {
 		Name:      "TestStaple",
 		ID:        0,
 		Content:   "TestContent",
-		CreatedAt: time.Date(1981, 3, 28, 0, 0, 0, 0, time.Local),
+		CreatedAt: time.Date(1981, 3, 28, 0, 0, 0, 0, time.UTC),
 		Archived:  false,
 	}, &testUser)
 
