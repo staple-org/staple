@@ -32,6 +32,9 @@ test:
 clean:
 	go clean -i
 
+lint:
+	golint -set_exit_status ./...
+
 .PHONY: run
 run:
 	go run cmd/root.go
