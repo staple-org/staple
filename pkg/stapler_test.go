@@ -69,7 +69,7 @@ func TestListStaples(t *testing.T) {
 		body, _ := ioutil.ReadAll(rec.Body)
 		expected := []byte(`{"staples":[{"name":"TestStaple","id":0,"content":"TestContent","created_at":"1981-03-28T00:00:00+01:00","archived":false}]}
 `)
-		assert.Equal(tt, expected, body, "expected body did not match")
+		assert.Equal(tt, string(expected), string(body), "expected body did not match")
 	})
 }
 
