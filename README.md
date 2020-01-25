@@ -1,4 +1,5 @@
 [![CircleCI](https://circleci.com/gh/staple-org/staple.svg?style=svg)](https://circleci.com/gh/staple-org/staple)
+[![codecov](https://codecov.io/gh/staple-org/staple/branch/master/graph/badge.svg)](https://codecov.io/gh/staple-org/staple)
 
 # Staple
 
