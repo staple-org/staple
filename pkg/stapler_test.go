@@ -66,10 +66,15 @@ func TestListStaples(t *testing.T) {
 		if rec.Code != http.StatusOK {
 			tt.Fatal("test failed with invalid code: ", rec.Code)
 		}
+		// Check content
 		body, _ := ioutil.ReadAll(rec.Body)
-		expected := []byte(`{"staples":[{"name":"TestStaple","id":0,"content":"TestContent","created_at":"1981-03-28T00:00:00+01:00","archived":false}]}
-`)
-		assert.Equal(tt, string(expected), string(body), "expected body did not match")
+		var staple struct {
+			Staples []models.Staple `json:"staples"`
+		}
+		err = json.Unmarshal(body, &staple)
+		assert.Len(tt, staple.Staples, 1, "should have returned a single result")
+		assert.Equal(tt, "TestStaple", staple.Staples[0].Name, "expected body did not match")
+		assert.Equal(tt, "TestContent", staple.Staples[0].Content, "expected body did not match")
 	})
 }
 

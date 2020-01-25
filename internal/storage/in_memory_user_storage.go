@@ -4,20 +4,20 @@ import (
 	"github.com/staple-org/staple/internal/models"
 )
 
-// PostgresUserStorer is a storer which uses Postgres as a storage backend.
+// InMemoryUserStorer is a storer which uses memory as a storage backend.
 type InMemoryUserStorer struct {
 	Err   error
 	store map[string]*models.User
 }
 
-// NewInMemoryUserStorer creates a new Postgres storage medium.
+// NewInMemoryUserStorer creates a new in memory storage medium.
 func NewInMemoryUserStorer() InMemoryUserStorer {
 	return InMemoryUserStorer{
 		store: make(map[string]*models.User),
 	}
 }
 
-// Create saves a user in the db.
+// Create saves a user in in memory.
 func (s InMemoryUserStorer) Create(email string, password []byte) error {
 	s.store[email] = &models.User{
 		Email:       email,
@@ -28,7 +28,7 @@ func (s InMemoryUserStorer) Create(email string, password []byte) error {
 	return s.Err
 }
 
-// Delete deletes a user from the db.
+// Delete deletes a user from in memory.
 func (s InMemoryUserStorer) Delete(email string) error {
 	if s.Err != nil {
 		return s.Err

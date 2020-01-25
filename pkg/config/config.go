@@ -16,7 +16,7 @@ type Config struct {
 	}
 	Mailer struct {
 		Domain string
-		ApiKey string
+		APIKey string
 	}
 }
 
@@ -30,8 +30,8 @@ type Message struct {
 	Error   string `json:"error"`
 }
 
-// ApiError wraps a message and a code into a struct for JSON parsing.
-func ApiError(m string, code int, err error) Message {
+// APIError wraps a message and a code into a struct for JSON parsing.
+func APIError(m string, code int, err error) Message {
 	if err == nil {
 		err = errors.New("")
 	}

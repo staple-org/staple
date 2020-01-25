@@ -39,7 +39,7 @@ func (p Stapler) Create(staple models.Staple, user *models.User) error {
 		return err
 	}
 	if len(list) >= user.MaxStaples {
-		return fmt.Errorf("Cannot create more staples than %d. Current count is: %d. Sorry. Read some of your staples first.", user.MaxStaples, len(list))
+		return fmt.Errorf("cannot create more staples than %d; current count is: %d", user.MaxStaples, len(list))
 	}
 	return p.storer.Create(staple, user.Email)
 }

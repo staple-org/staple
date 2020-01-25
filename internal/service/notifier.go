@@ -40,7 +40,7 @@ func NewEmailNotifier() EmailNotifier {
 
 var (
 	domain                = config.Opts.Mailer.Domain
-	mgAPIKey              = config.Opts.Mailer.ApiKey
+	mgAPIKey              = config.Opts.Mailer.APIKey
 	passwordResetTemplate = `Dear %s
 Your password has been successfully reset to: %s. Please change as soon as possible.`
 	confirmCodeTemplate = `Dear %s

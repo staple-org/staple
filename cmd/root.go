@@ -21,7 +21,7 @@ func init() {
 		"postgresql://localhost/staples?user=staple&password=password123",
 		"--database-connection-url postgresql://localhost/staples?user=staple&password=password123")
 	flag.StringVar(&config.Opts.Mailer.Domain, "mg-domain", "", "--mg-domain <MG_DOMAIN>")
-	flag.StringVar(&config.Opts.Mailer.ApiKey, "mg-api-key", "", "--mg-api-key <MG_API_KEY>")
+	flag.StringVar(&config.Opts.Mailer.APIKey, "mg-api-key", "", "--mg-api-key <MG_API_KEY>")
 	flag.Parse()
 }
 

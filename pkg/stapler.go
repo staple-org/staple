@@ -30,20 +30,20 @@ func AddStaple(stapler service.Staplerer, userHandler service.UserHandlerer) ech
 		}
 		maximumStaples, err := userHandler.GetMaximumStaples(*userModel)
 		if err != nil {
-			apiError := config.ApiError("failed to get maximum staples for user", http.StatusInternalServerError, err)
+			apiError := config.APIError("failed to get maximum staples for user", http.StatusInternalServerError, err)
 			return c.JSON(http.StatusInternalServerError, apiError)
 		}
 		userModel.MaxStaples = maximumStaples
 		staple := &models.Staple{}
 		err = c.Bind(staple)
 		if err != nil {
-			apiError := config.ApiError("failed to bind body", http.StatusInternalServerError, err)
+			apiError := config.APIError("failed to bind body", http.StatusInternalServerError, err)
 			return c.JSON(http.StatusInternalServerError, apiError)
 		}
 		staple.CreatedAt = time.Now().UTC()
 		err = stapler.Create(*staple, userModel)
 		if err != nil {
-			apiError := config.ApiError("Unable to create staple for user.", http.StatusInternalServerError, err)
+			apiError := config.APIError("Unable to create staple for user.", http.StatusInternalServerError, err)
 			return c.JSON(http.StatusInternalServerError, apiError)
 		}
 		return c.NoContent(http.StatusOK)
@@ -64,7 +64,7 @@ func GetNext(staple service.Staplerer) echo.HandlerFunc {
 		}
 		s, err := staple.GetNext(userModel)
 		if err != nil {
-			apiError := config.ApiError("failed getting next staple", http.StatusInternalServerError, err)
+			apiError := config.APIError("failed getting next staple", http.StatusInternalServerError, err)
 			return c.JSON(http.StatusInternalServerError, apiError)
 		}
 		var staple = struct {
@@ -90,21 +90,21 @@ func GetStaple(stapler service.Staplerer) echo.HandlerFunc {
 		}
 		id := c.Param("id")
 		if id == "" {
-			apiError := config.ApiError("invalid id", http.StatusBadRequest, nil)
+			apiError := config.APIError("invalid id", http.StatusBadRequest, nil)
 			return c.JSON(http.StatusBadRequest, apiError)
 		}
 		n, err := strconv.Atoi(id)
 		if err != nil {
-			apiError := config.ApiError("failed to convert id to number", http.StatusInternalServerError, err)
+			apiError := config.APIError("failed to convert id to number", http.StatusInternalServerError, err)
 			return c.JSON(http.StatusInternalServerError, apiError)
 		}
 		s, err := stapler.Get(userModel, n)
 		if err != nil {
-			apiError := config.ApiError("something went wrong", http.StatusInternalServerError, err)
+			apiError := config.APIError("something went wrong", http.StatusInternalServerError, err)
 			return c.JSON(http.StatusInternalServerError, apiError)
 		}
 		if s == nil {
-			apiError := config.ApiError("staple not found", http.StatusBadRequest, nil)
+			apiError := config.APIError("staple not found", http.StatusBadRequest, nil)
 			return c.JSON(http.StatusBadRequest, apiError)
 		}
 		var staple = struct {
@@ -130,7 +130,7 @@ func ListStaples(stapler service.Staplerer) echo.HandlerFunc {
 		}
 		s, err := stapler.List(userModel)
 		if err != nil {
-			apiError := config.ApiError("Unable to list staples for user.", http.StatusInternalServerError, err)
+			apiError := config.APIError("Unable to list staples for user.", http.StatusInternalServerError, err)
 			return c.JSON(http.StatusInternalServerError, apiError)
 		}
 		var staples = struct {
@@ -156,7 +156,7 @@ func ShowArchive(stapler service.Staplerer) echo.HandlerFunc {
 		}
 		s, err := stapler.ShowArchive(userModel)
 		if err != nil {
-			apiError := config.ApiError("Unable to list staples for user.", http.StatusInternalServerError, err)
+			apiError := config.APIError("Unable to list staples for user.", http.StatusInternalServerError, err)
 			return c.JSON(http.StatusInternalServerError, apiError)
 		}
 		var staples = struct {
@@ -187,12 +187,12 @@ func DeleteStaple(stapler service.Staplerer) echo.HandlerFunc {
 		}
 		n, err := strconv.Atoi(id)
 		if err != nil {
-			apiError := config.ApiError("failed to convert id to number", http.StatusInternalServerError, err)
+			apiError := config.APIError("failed to convert id to number", http.StatusInternalServerError, err)
 			return c.JSON(http.StatusInternalServerError, apiError)
 		}
 		err = stapler.Delete(userModel, n)
 		if err != nil {
-			apiError := config.ApiError("Unable to delete staple.", http.StatusInternalServerError, err)
+			apiError := config.APIError("Unable to delete staple.", http.StatusInternalServerError, err)
 			return c.JSON(http.StatusInternalServerError, apiError)
 		}
 		return c.NoContent(http.StatusOK)
@@ -218,12 +218,12 @@ func ArchiveStaple(stapler service.Staplerer) echo.HandlerFunc {
 		}
 		n, err := strconv.Atoi(id)
 		if err != nil {
-			apiError := config.ApiError("failed to convert id to number", http.StatusInternalServerError, err)
+			apiError := config.APIError("failed to convert id to number", http.StatusInternalServerError, err)
 			return c.JSON(http.StatusInternalServerError, apiError)
 		}
 		err = stapler.Archive(userModel, n)
 		if err != nil {
-			apiError := config.ApiError("Unable to delete staple.", http.StatusInternalServerError, err)
+			apiError := config.APIError("Unable to delete staple.", http.StatusInternalServerError, err)
 			return c.JSON(http.StatusInternalServerError, apiError)
 		}
 		return c.NoContent(http.StatusOK)

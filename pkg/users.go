@@ -89,12 +89,12 @@ func ChangePassword(userHandler service.UserHandlerer) echo.HandlerFunc {
 			return err
 		}
 		if password.Password == "" {
-			apiError := config.ApiError("password is empty", http.StatusBadRequest, nil)
+			apiError := config.APIError("password is empty", http.StatusBadRequest, nil)
 			return c.JSON(http.StatusBadRequest, apiError)
 		}
 		err = userHandler.ChangePassword(*userModel, password.Password)
 		if err != nil {
-			apiError := config.ApiError("failed to change password", http.StatusInternalServerError, nil)
+			apiError := config.APIError("failed to change password", http.StatusInternalServerError, nil)
 			return c.JSON(http.StatusInternalServerError, apiError)
 		}
 		return c.NoContent(http.StatusOK)
@@ -123,16 +123,16 @@ func SetMaximumStaples(userHandler service.UserHandlerer) echo.HandlerFunc {
 		}
 		stapleCount, err := strconv.Atoi(maxStaples.Staples)
 		if err != nil {
-			apiError := config.ApiError("failed to convert staple to string", http.StatusBadRequest, err)
+			apiError := config.APIError("failed to convert staple to string", http.StatusBadRequest, err)
 			return c.JSON(http.StatusBadRequest, apiError)
 		}
 		if stapleCount <= 0 || stapleCount > 100 {
-			apiError := config.ApiError("invalid staple setting", http.StatusBadRequest, nil)
+			apiError := config.APIError("invalid staple setting", http.StatusBadRequest, nil)
 			return c.JSON(http.StatusBadRequest, apiError)
 		}
 		err = userHandler.SetMaximumStaples(*userModel, stapleCount)
 		if err != nil {
-			apiError := config.ApiError("failed to set maximum staples", http.StatusInternalServerError, nil)
+			apiError := config.APIError("failed to set maximum staples", http.StatusInternalServerError, nil)
 			return c.JSON(http.StatusInternalServerError, apiError)
 		}
 		return c.NoContent(http.StatusOK)
@@ -153,7 +153,7 @@ func GetMaximumStaples(userHandler service.UserHandlerer) echo.HandlerFunc {
 		}
 		staples, err := userHandler.GetMaximumStaples(*userModel)
 		if err != nil {
-			apiError := config.ApiError("failed to get maximum staples", http.StatusInternalServerError, nil)
+			apiError := config.APIError("failed to get maximum staples", http.StatusInternalServerError, nil)
 			return c.JSON(http.StatusInternalServerError, apiError)
 		}
 
@@ -196,7 +196,7 @@ func VerfiyConfirmCode(userHandler service.UserHandlerer) echo.HandlerFunc {
 			})
 		}
 		if ok, err := userHandler.VerifyConfirmCode(user); err != nil {
-			apiError := config.ApiError("error while confirming link", http.StatusBadRequest, err)
+			apiError := config.APIError("error while confirming link", http.StatusBadRequest, err)
 			return c.JSON(http.StatusBadRequest, apiError)
 		} else if ok {
 			return c.NoContent(http.StatusOK)

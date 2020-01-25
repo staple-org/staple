@@ -7,19 +7,19 @@ import (
 	"github.com/staple-org/staple/internal/models"
 )
 
-// PostgresStapleStorer is a storer which uses Postgres as a storage backend.
+// InMemoryStapleStorer is a storer which uses a map as a storage backend.
 type InMemoryStapleStorer struct {
 	// email as key
 	stapleStore map[string][]models.Staple
 	Err         error // can be set to simulate an error
 }
 
-// NewPostgresStapleStorer creates a new Postgres storage medium.
+// NewInMemoryStapleStorer creates a new in memory storage medium.
 func NewInMemoryStapleStorer() InMemoryStapleStorer {
 	return InMemoryStapleStorer{stapleStore: make(map[string][]models.Staple)}
 }
 
-// Create will create a staple in the underlying postgres storage medium.
+// Create will create a staple in the underlying in memory storage medium.
 func (p InMemoryStapleStorer) Create(staple models.Staple, email string) error {
 	if _, ok := p.stapleStore[email]; !ok {
 		p.stapleStore[email] = make([]models.Staple, 0)
