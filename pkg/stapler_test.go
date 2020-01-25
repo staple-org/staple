@@ -51,7 +51,7 @@ func TestListStaples(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	t.Run("successful staple create", func(tt *testing.T) {
+	t.Run("successful staple list", func(tt *testing.T) {
 		req := httptest.NewRequest(echo.GET, "/rest/api/1/staple", bytes.NewBuffer([]byte("")))
 		req.Header.Set("Content-Type", "application/json")
 		req.Header.Set("Authorization", "Bearer "+tok)
