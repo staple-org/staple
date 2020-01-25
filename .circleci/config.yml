@@ -51,6 +51,7 @@ jobs:
       - run:
           name: Make binaries
           command: |
+            make bootstrap
             make binaries
 
 workflows:
