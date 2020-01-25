@@ -1,6 +1,7 @@
 package service
 
 import (
+	"bytes"
 	"fmt"
 	"log"
 	"time"
@@ -48,15 +49,6 @@ Please enter the following code into the confirm code window: %s`
 
 // Notify attempts to send out an email using mailgun contaning the new password.
 func (e EmailNotifier) Notify(email string, event Event, payload string) error {
-	var body string
-	switch event {
-	case PasswordReset:
-		body = fmt.Sprintf(passwordResetTemplate, email, payload)
-	case GenerateConfirmCode:
-		body = fmt.Sprintf(confirmCodeTemplate, email, payload)
-	}
-
-	mg := mailgun.NewMailgun(domain, mgAPIKey)
 	sender := fmt.Sprintf("no-reply@%s", domain)
 	subject := fmt.Sprintf("[%s] %s Notification", time.Now().Format("2006-01-02"), event)
 
@@ -66,7 +58,39 @@ func (e EmailNotifier) Notify(email string, event Event, payload string) error {
 		return nil
 	}
 
+	var body string
+	switch event {
+	case PasswordReset:
+		body = fmt.Sprintf(passwordResetTemplate, email, payload)
+	case GenerateConfirmCode:
+		body = fmt.Sprintf(confirmCodeTemplate, email, payload)
+	}
+
+	mg := mailgun.NewMailgun(domain, mgAPIKey)
 	message := mg.NewMessage(sender, subject, body, email)
 	_, _, err := mg.Send(message)
 	return err
+}
+
+// BufferNotifier uses a byte buffer for notifications.
+type BufferNotifier struct {
+	buffer bytes.Buffer
+}
+
+// NewBufferNotifier creates a new notifier.
+func NewBufferNotifier() BufferNotifier {
+	return BufferNotifier{}
+}
+
+// Notify uses a buffer to store notifications for a user.
+func (b BufferNotifier) Notify(email string, event Event, payload string) error {
+	var body string
+	switch event {
+	case PasswordReset:
+		body = fmt.Sprintf(passwordResetTemplate, email, payload)
+	case GenerateConfirmCode:
+		body = fmt.Sprintf(confirmCodeTemplate, email, payload)
+	}
+	b.buffer.WriteString(body)
+	return nil
 }

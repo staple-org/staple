@@ -90,7 +90,8 @@ func GetStaple(stapler service.Staplerer) echo.HandlerFunc {
 		}
 		id := c.Param("id")
 		if id == "" {
-			return errors.New("invalid id")
+			apiError := config.ApiError("invalid id", http.StatusBadRequest, nil)
+			return c.JSON(http.StatusBadRequest, apiError)
 		}
 		n, err := strconv.Atoi(id)
 		if err != nil {
