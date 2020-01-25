@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/staple-org/staple.svg?style=svg)](https://circleci.com/gh/staple-org/staple)
+
 # Staple
 
 The backend of staple
