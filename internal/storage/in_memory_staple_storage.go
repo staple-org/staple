@@ -57,7 +57,7 @@ func (p InMemoryStapleStorer) Delete(email string, stapleID int) error {
 // Get retrieves a staple.
 func (p InMemoryStapleStorer) Get(email string, stapleID int) (*models.Staple, error) {
 	for _, s := range p.stapleStore[email] {
-		if s.ID == stapleID {
+		if s.ID == stapleID && !s.Archived {
 			return &s, nil
 		}
 	}
@@ -81,6 +81,7 @@ func (p InMemoryStapleStorer) Archive(email string, stapleID int) error {
 		if s.ID == stapleID {
 			s.Archived = true
 			p.stapleStore[email][i] = s
+			return p.Err
 		}
 	}
 	return p.Err
