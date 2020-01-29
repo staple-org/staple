@@ -12,7 +12,10 @@ type Config struct {
 	Hostname       string
 	GlobalTokenKey string
 	Database       struct {
-		ConnectionURL string
+		Hostname string
+		Username string
+		Password string
+		Database string
 	}
 	Mailer struct {
 		Domain string

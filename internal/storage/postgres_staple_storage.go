@@ -2,6 +2,7 @@ package storage
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/jackc/pgx/v4"
@@ -19,7 +20,8 @@ func NewPostgresStapleStorer() PostgresStapleStorer {
 }
 
 func (p PostgresStapleStorer) connect() (*pgx.Conn, error) {
-	conn, err := pgx.Connect(context.Background(), config.Opts.Database.ConnectionURL)
+	url := fmt.Sprintf("postgresql://%s/%s?user=%s&password=%s", config.Opts.Database.Hostname, config.Opts.Database, config.Opts.Database.Username, config.Opts.Database.Password)
+	conn, err := pgx.Connect(context.Background(), url)
 	if err != nil {
 		return nil, err
 	}
