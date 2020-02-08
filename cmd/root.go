@@ -9,7 +9,7 @@ import (
 )
 
 func init() {
-	flag.BoolVar(&config.Opts.DevMode, "dev", true, "--dev")
+	flag.BoolVar(&config.Opts.DevMode, "dev", false, "--dev")
 	flag.BoolVar(&config.Opts.AutoTLS, "auto-tls", false, "--auto-tls")
 	flag.StringVar(&config.Opts.CacheDir, "cache-dir", "", "--cache-dir /home/user/.server/.cache")
 	flag.StringVar(&config.Opts.ServerKeyPath, "server-key-path", "", "--server-key-path /home/user/.server/server.key")
