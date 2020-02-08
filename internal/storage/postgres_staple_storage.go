@@ -20,7 +20,7 @@ func NewPostgresStapleStorer() PostgresStapleStorer {
 }
 
 func (p PostgresStapleStorer) connect() (*pgx.Conn, error) {
-	url := fmt.Sprintf("postgresql://%s/%s?user=%s&password=%s", config.Opts.Database.Hostname, config.Opts.Database, config.Opts.Database.Username, config.Opts.Database.Password)
+	url := fmt.Sprintf("postgresql://%s/%s?user=%s&password=%s", config.Opts.Database.Hostname, config.Opts.Database.Database, config.Opts.Database.Username, config.Opts.Database.Password)
 	conn, err := pgx.Connect(context.Background(), url)
 	if err != nil {
 		return nil, err

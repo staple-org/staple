@@ -7,7 +7,9 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"net/http"
 
+	rice "github.com/GeertJohan/go.rice"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"golang.org/x/crypto/acme/autocert"
@@ -46,6 +48,22 @@ func Serve() error {
 	//	AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
 	//}))
 
+	// Setup front-end if not in production mode.
+	if !config.Opts.DevMode {
+		staticAssets, err := rice.FindBox("../frontend/build")
+		if err != nil {
+			log.Fatal("Cannot find assets in production")
+			return err
+		}
+
+		// Register handler for static assets
+		assetHandler := http.FileServer(staticAssets.HTTPBox())
+		e.GET("/", echo.WrapHandler(assetHandler))
+		e.GET("/favicon.ico", echo.WrapHandler(assetHandler))
+		e.GET("/static/css/*", echo.WrapHandler(http.StripPrefix("/", assetHandler)))
+		e.GET("/static/js/*", echo.WrapHandler(http.StripPrefix("/", assetHandler)))
+		e.GET("/static/media/*", echo.WrapHandler(http.StripPrefix("/", assetHandler)))
+	}
 	// Register a user.
 	ctx := context.Background()
 	postgresUserStorer := storage.NewPostgresUserStorer()

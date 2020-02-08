@@ -99,7 +99,7 @@ func (s PostgresUserStorer) Update(email string, newUser models.User) error {
 }
 
 func (s PostgresUserStorer) connect() (*pgx.Conn, error) {
-	url := fmt.Sprintf("postgresql://%s/%s?user=%s&password=%s", config.Opts.Database.Hostname, config.Opts.Database, config.Opts.Database.Username, config.Opts.Database.Password)
+	url := fmt.Sprintf("postgresql://%s/%s?user=%s&password=%s", config.Opts.Database.Hostname, config.Opts.Database.Database, config.Opts.Database.Username, config.Opts.Database.Password)
 	conn, err := pgx.Connect(context.Background(), url)
 	if err != nil {
 		log.Println("Failed to connect to database: ", err)

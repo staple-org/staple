@@ -21,6 +21,7 @@ type Config struct {
 		Domain string
 		APIKey string
 	}
+	DevMode bool
 }
 
 // Opts represents server side configuration for Staple.

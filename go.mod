@@ -3,6 +3,7 @@ module github.com/staple-org/staple
 go 1.12
 
 require (
+	github.com/GeertJohan/go.rice v1.0.0
 	github.com/coreos/go-systemd v0.0.0-20190719114852-fd7a80b32e1f // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/facebookgo/ensure v0.0.0-20160127193407-b4ab57deab51 // indirect

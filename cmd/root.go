@@ -9,6 +9,7 @@ import (
 )
 
 func init() {
+	flag.BoolVar(&config.Opts.DevMode, "dev", true, "--dev")
 	flag.BoolVar(&config.Opts.AutoTLS, "auto-tls", false, "--auto-tls")
 	flag.StringVar(&config.Opts.CacheDir, "cache-dir", "", "--cache-dir /home/user/.server/.cache")
 	flag.StringVar(&config.Opts.ServerKeyPath, "server-key-path", "", "--server-key-path /home/user/.server/server.key")
@@ -17,7 +18,7 @@ func init() {
 	flag.StringVar(&config.Opts.Hostname, "hostname", "localhost", "--hostname staple-clipper.org")
 	flag.StringVar(&config.Opts.GlobalTokenKey, "token-key", "", "--token-key <random-data>")
 	flag.StringVar(&config.Opts.Database.Hostname, "staple-db-hostname", "localhost", "--staple-db-hostname localhost")
-	flag.StringVar(&config.Opts.Database.Database, "staple-db-database", "staplea", "--staple-db-database staples")
+	flag.StringVar(&config.Opts.Database.Database, "staple-db-database", "staples", "--staple-db-database staples")
 	flag.StringVar(&config.Opts.Database.Username, "staple-db-username", "staple", "--staple-db-username staple")
 	flag.StringVar(&config.Opts.Database.Password, "staple-db-password", "password123", "--staple-db-password password123")
 	flag.StringVar(&config.Opts.Mailer.Domain, "mg-domain", "", "--mg-domain <MG_DOMAIN>")
