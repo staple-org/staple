@@ -11,24 +11,25 @@ export default function Archives(props) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    async function onLoad() {
-      setIsLoading(true);
-      try {
-        fetch(config.HOST+"/rest/api/1/staple/archive", {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + Cookie.get('token'),
-          },
-        }).then(response => response.json())
-          .then(data => setStaples(data))
-          .catch(e => alert(e.message));
-      } catch (e) {
-        alert(e);
-      }
-      setIsLoading(false);
+  async function onLoad() {
+    setIsLoading(true);
+    try {
+      fetch(config.HOST+"/rest/api/1/staple/archive", {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + Cookie.get('token'),
+        },
+      }).then(response => response.json())
+        .then(data => setStaples(data))
+        .catch(e => alert(e.message));
+    } catch (e) {
+      alert(e);
     }
+    setIsLoading(false);
+  }
+
+  useEffect(() => {
     onLoad();
   }, [props.match.params.id]);
 
@@ -45,7 +46,8 @@ export default function Archives(props) {
         if (response.ok) {
           setIsDeleting(false);
           setStaple({});
-          window.location.reload();
+          // window.location.reload();
+          onLoad();
         }
       }).catch(e => alert(e.message));
     } catch (e) {

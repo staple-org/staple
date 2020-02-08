@@ -30,7 +30,8 @@ export default function Settings(props) {
       }).then((response) => {
         if (response.status === 200) {
           alert(`New staple count of ${maxStaples} successfully set.`);
-          window.location.reload();
+          // window.location.reload();
+          onLoad();
         } else {
           alert("Response was: " + response.statusText);
         }
@@ -91,24 +92,24 @@ export default function Settings(props) {
     return true
   }
 
-  useEffect(() => {
-    async function onLoad() {
-      try {
-        fetch(config.HOST+"/rest/api/1/user/max-staples", {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + Cookie.get('token'),
-          },
-        }).then(response => response.json())
-          .then(data => setMaxStaples(data.max_staples))
-          .catch(e => alert(e.message));
-      } catch (e) {
-        alert(e);
-      }
-      setIsLoading(false);
+  async function onLoad() {
+    try {
+      fetch(config.HOST+"/rest/api/1/user/max-staples", {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + Cookie.get('token'),
+        },
+      }).then(response => response.json())
+        .then(data => setMaxStaples(data.max_staples))
+        .catch(e => alert(e.message));
+    } catch (e) {
+      alert(e);
     }
+    setIsLoading(false);
+  }
 
+  useEffect(() => {
     onLoad();
   }, []);
 
