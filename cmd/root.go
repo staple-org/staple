@@ -23,6 +23,7 @@ func init() {
 	flag.StringVar(&config.Opts.Database.Password, "staple-db-password", "password123", "--staple-db-password password123")
 	flag.StringVar(&config.Opts.Mailer.Domain, "mg-domain", "", "--mg-domain <MG_DOMAIN>")
 	flag.StringVar(&config.Opts.Mailer.APIKey, "mg-api-key", "", "--mg-api-key <MG_API_KEY>")
+	flag.StringVar(&config.Opts.Frontend, "frontend", "../frontend/build", "--frontend <relative location of frontend directory>")
 	flag.Parse()
 }
 

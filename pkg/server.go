@@ -50,7 +50,7 @@ func Serve() error {
 
 	// Setup front-end if not in production mode.
 	if !config.Opts.DevMode {
-		staticAssets, err := rice.FindBox("../frontend/build")
+		staticAssets, err := rice.FindBox(config.Opts.Frontend)
 		if err != nil {
 			log.Fatal("Cannot find assets in production")
 			return err
@@ -59,12 +59,6 @@ func Serve() error {
 		// Register handler for static assets
 		assetHandler := http.FileServer(staticAssets.HTTPBox())
 		e.GET("/", echo.WrapHandler(assetHandler))
-		e.GET("/archive", echo.WrapHandler(assetHandler))
-		e.GET("/setting", echo.WrapHandler(assetHandler))
-		e.GET("/staples/new", echo.WrapHandler(assetHandler))
-		e.GET("/reset", echo.WrapHandler(assetHandler))
-		e.GET("/signup", echo.WrapHandler(assetHandler))
-		e.GET("/login", echo.WrapHandler(assetHandler))
 		e.GET("/favicon.ico", echo.WrapHandler(assetHandler))
 		e.GET("/static/css/*", echo.WrapHandler(http.StripPrefix("/", assetHandler)))
 		e.GET("/static/js/*", echo.WrapHandler(http.StripPrefix("/", assetHandler)))
