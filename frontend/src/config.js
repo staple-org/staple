@@ -1,3 +1,3 @@
 export default {
-  HOST: process.env.REACT_APP_STAPLE_HOST || "http://localhost:9998"
+  HOST: process.env.REACT_APP_STAPLE_HOST || "rest/api/1"
 }

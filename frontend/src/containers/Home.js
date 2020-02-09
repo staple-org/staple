@@ -17,7 +17,7 @@ export default function Home(props) {
     setIsLoading(true);
     event.preventDefault();
     try {
-      fetch(config.HOST+`/rest/api/1/staple/${id}/archive`, {
+      fetch(config.HOST+`/staple/${id}/archive`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -38,7 +38,7 @@ export default function Home(props) {
     setIsDeleting(true);
     event.preventDefault();
     try {
-      fetch(config.HOST+`/rest/api/1/staple/${id}`, {
+      fetch(config.HOST+`/staple/${id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -150,7 +150,7 @@ export default function Home(props) {
       }
 
       try {
-        fetch(config.HOST+"/rest/api/1/staple", {
+        fetch(config.HOST+"/staple", {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -164,7 +164,7 @@ export default function Home(props) {
       }
 
       try {
-        fetch(config.HOST+"/rest/api/1/staple/next", {
+        fetch(config.HOST+"/staple/next", {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',

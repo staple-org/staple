@@ -14,7 +14,7 @@ export default function Archives(props) {
   async function onLoad() {
     setIsLoading(true);
     try {
-      fetch(config.HOST+"/rest/api/1/staple/archive", {
+      fetch(config.HOST+"/staple/archive", {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -36,7 +36,7 @@ export default function Archives(props) {
   async function handleDelete(id) {
     setIsDeleting(true);
     try {
-      fetch(config.HOST+`/rest/api/1/staple/${id}`, {
+      fetch(config.HOST+`/staple/${id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -59,7 +59,7 @@ export default function Archives(props) {
 
   function fetchStaple(id) {
     try {
-      fetch(config.HOST+`/rest/api/1/staple/${id}`, {
+      fetch(config.HOST+`/staple/${id}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

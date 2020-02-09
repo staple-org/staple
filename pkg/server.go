@@ -59,6 +59,12 @@ func Serve() error {
 		// Register handler for static assets
 		assetHandler := http.FileServer(staticAssets.HTTPBox())
 		e.GET("/", echo.WrapHandler(assetHandler))
+		e.GET("/archive", echo.WrapHandler(assetHandler))
+		e.GET("/setting", echo.WrapHandler(assetHandler))
+		e.GET("/staples/new", echo.WrapHandler(assetHandler))
+		e.GET("/reset", echo.WrapHandler(assetHandler))
+		e.GET("/signup", echo.WrapHandler(assetHandler))
+		e.GET("/login", echo.WrapHandler(assetHandler))
 		e.GET("/favicon.ico", echo.WrapHandler(assetHandler))
 		e.GET("/static/css/*", echo.WrapHandler(http.StripPrefix("/", assetHandler)))
 		e.GET("/static/js/*", echo.WrapHandler(http.StripPrefix("/", assetHandler)))
@@ -69,15 +75,16 @@ func Serve() error {
 	postgresUserStorer := storage.NewPostgresUserStorer()
 	emailNotifier := service.NewEmailNotifier()
 	userHandler := service.NewUserHandler(ctx, postgresUserStorer, emailNotifier)
-	e.POST("/register", RegisterUser(userHandler))
+	api := "/rest/api/1"
+
+	e.POST(api+"/register", RegisterUser(userHandler))
 	// Generate a token for a given username.
-	e.POST("/get-token", TokenHandler(userHandler))
+	e.POST(api+"/get-token", TokenHandler(userHandler))
 
 	// Reset Password Flow
-	e.POST("/reset", ResetPassword(userHandler))
-	e.POST("/verify", VerfiyConfirmCode(userHandler))
+	e.POST(api+"/reset", ResetPassword(userHandler))
+	e.POST(api+"/verify", VerfiyConfirmCode(userHandler))
 
-	api := "/rest/api/1"
 	//gob.Register(map[string]interface{}{})
 	postgresStapleStorer := storage.NewPostgresStapleStorer()
 	stapler := service.NewStapler(postgresStapleStorer)

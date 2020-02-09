@@ -18,7 +18,7 @@ export default function Settings(props) {
     setIsLoading(true);
 
     try {
-      fetch(config.HOST+'/rest/api/1/user/max-staples', {
+      fetch(config.HOST+'/user/max-staples', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -57,7 +57,7 @@ export default function Settings(props) {
     setIsLoading(true);
 
     try {
-      fetch(config.HOST+'/rest/api/1/user/change-password', {
+      fetch(config.HOST+'/user/change-password', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -94,7 +94,7 @@ export default function Settings(props) {
 
   async function onLoad() {
     try {
-      fetch(config.HOST+"/rest/api/1/user/max-staples", {
+      fetch(config.HOST+"/user/max-staples", {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

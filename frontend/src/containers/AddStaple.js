@@ -20,7 +20,7 @@ export default function AddStaple(props) {
     event.preventDefault();
     setIsLoading(true);
     try {
-      fetch(config.HOST+"/rest/api/1/staple", {
+      fetch(config.HOST+"/staple", {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
