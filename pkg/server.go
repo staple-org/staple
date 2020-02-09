@@ -50,7 +50,7 @@ func Serve() error {
 
 	// Setup front-end if not in production mode.
 	if !config.Opts.DevMode {
-		staticAssets, err := rice.FindBox(config.Opts.Frontend)
+		staticAssets, err := rice.FindBox("../frontend/build")
 		if err != nil {
 			log.Fatal("Cannot find assets in production")
 			return err

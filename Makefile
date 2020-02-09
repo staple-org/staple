@@ -42,3 +42,8 @@ run:
 .PHONY: start-https
 start-https:
 	go run cmd/root.go --server-key-path ./certs/key.pem --server-crt-path ./certs/cert.pem
+
+static_assets:
+	go get github.com/GeertJohan/go.rice && \
+	go get github.com/GeertJohan/go.rice/rice && \
+	rice embed-go

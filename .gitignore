@@ -17,3 +17,4 @@
 # Build folder
 build
 node_modules
+rice-box.go
