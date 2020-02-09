@@ -46,4 +46,4 @@ start-https:
 static_assets:
 	go get github.com/GeertJohan/go.rice && \
 	go get github.com/GeertJohan/go.rice/rice && \
-	rice embed-go
+	cd pkg && rm rice-box.go && rice embed-go
