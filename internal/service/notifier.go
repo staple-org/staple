@@ -3,7 +3,6 @@ package service
 import (
 	"bytes"
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/mailgun/mailgun-go"
@@ -54,8 +53,8 @@ func (e EmailNotifier) Notify(email string, event Event, payload string) error {
 	subject := fmt.Sprintf("[%s] %s Notification", time.Now().Format("2006-01-02"), event)
 
 	if domain == "" && mgAPIKey == "" {
-		log.Println("[WARNING] Mailgun not set up. Falling back to console output...")
-		log.Printf("A notification attempt was made for user %s with subject %q and payload %q", email, subject, payload)
+		config.Opts.Logger.Warn().Msg("[WARNING] Mailgun not set up. Falling back to console output...")
+		config.Opts.Logger.Info().Str("email", email).Str("subject", subject).Str("payload", payload).Msg("A notification attempt was made for user.")
 		return nil
 	}
 

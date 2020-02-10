@@ -3,7 +3,6 @@ package storage
 import (
 	"context"
 	"fmt"
-	"log"
 
 	"github.com/jackc/pgx/v4"
 
@@ -102,7 +101,7 @@ func (s PostgresUserStorer) connect() (*pgx.Conn, error) {
 	url := fmt.Sprintf("postgresql://%s/%s?user=%s&password=%s", config.Opts.Database.Hostname, config.Opts.Database.Database, config.Opts.Database.Username, config.Opts.Database.Password)
 	conn, err := pgx.Connect(context.Background(), url)
 	if err != nil {
-		log.Println("Failed to connect to database: ", err)
+		config.Opts.Logger.Error().Err(err).Msg("Failed to connect to the database")
 		return nil, err
 	}
 	return conn, nil

@@ -4,9 +4,9 @@ import (
 	"context"
 	"crypto/rand"
 	"errors"
-	"log"
 
 	"github.com/google/uuid"
+	"github.com/staple-org/staple/pkg/config"
 	"golang.org/x/crypto/bcrypt"
 
 	"github.com/staple-org/staple/internal/models"
@@ -181,7 +181,7 @@ func (u UserHandler) ChangePassword(user models.User, newPassword string) error 
 	}
 	storedUser, err := u.store.Get(user.Email)
 	if err != nil {
-		log.Println("Error while getting user: ", err)
+		config.Opts.Logger.Error().Err(err).Msg("Error while getting user")
 		return err
 	}
 	hashPassword, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
@@ -190,7 +190,7 @@ func (u UserHandler) ChangePassword(user models.User, newPassword string) error 
 	}
 	storedUser.Password = string(hashPassword)
 	if err := u.store.Update(user.Email, *storedUser); err != nil {
-		log.Println("Error while storing user: ", err)
+		config.Opts.Logger.Error().Err(err).Msg("Error while storing user")
 		return err
 	}
 	return nil

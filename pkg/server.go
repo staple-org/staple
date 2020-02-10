@@ -8,6 +8,9 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
+
+	"github.com/rs/zerolog"
 
 	rice "github.com/GeertJohan/go.rice"
 	"github.com/labstack/echo/v4"
@@ -21,14 +24,13 @@ import (
 
 // Serve starts the Stapler API server.
 func Serve() error {
-	log.Println("Starting listener...")
 	// Echo instance
 	e := echo.New()
 	// Register the template renderer
 
 	// Setup Global Token Key
 	if config.Opts.GlobalTokenKey == "" {
-		log.Print("Please set a global secret key... Randomly generating one for now...")
+		config.Opts.Logger.Info().Msg("Please set a global secret key... Randomly generating one for now...")
 		b := make([]byte, 32)
 		_, err := rand.Read(b)
 		if err != nil {
@@ -36,17 +38,26 @@ func Serve() error {
 		}
 		state := base64.StdEncoding.EncodeToString(b)
 		config.Opts.GlobalTokenKey = state
-		log.Println("done.")
 	}
+
+	// Setup Logger
+	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
+	zerolog.SetGlobalLevel(zerolog.InfoLevel)
+	if config.Opts.Debug {
+		zerolog.SetGlobalLevel(zerolog.DebugLevel)
+	}
+	config.Opts.Logger = zerolog.New(os.Stdout)
+
+	if e := config.Opts.Logger.Debug(); e.Enabled() {
+		config.Opts.Logger.Debug().Interface("config", config.Opts)
+	}
+
+	config.Opts.Logger.Info().Msg("Starting listener...")
 
 	// Middleware
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 	e.Use(middleware.CORS())
-	//e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-	//	AllowOrigins: []string{"https://staple.cronohub.org"},
-	//	AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
-	//}))
 
 	// Setup front-end if not in production mode.
 	if !config.Opts.DevMode {

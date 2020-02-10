@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/json"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -140,7 +139,6 @@ func TestAddStaples(t *testing.T) {
 		}
 		err = json.Unmarshal(body, &staple)
 		assert.NoError(tt, err)
-		log.Println("The body: ", string(body))
 		assert.Equal(tt, "testcreate", staple.Staple.Name)
 		assert.Equal(tt, "testcontent", staple.Staple.Content)
 	})

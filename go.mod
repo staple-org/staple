@@ -18,6 +18,7 @@ require (
 	github.com/mailgun/mailgun-go v2.0.0+incompatible
 	github.com/onsi/ginkgo v1.11.0 // indirect
 	github.com/onsi/gomega v1.8.1 // indirect
+	github.com/rs/zerolog v1.15.0
 	github.com/stretchr/objx v0.2.0 // indirect
 	github.com/stretchr/testify v1.4.0
 	golang.org/x/crypto v0.0.0-20191227163750-53104e6ec876

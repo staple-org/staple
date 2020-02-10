@@ -1,7 +1,6 @@
 package pkg
 
 import (
-	"log"
 	"net/http"
 	"strconv"
 
@@ -32,7 +31,7 @@ func RegisterUser(userHandler service.UserHandlerer) echo.HandlerFunc {
 				"message": "User already registered.",
 			})
 		} else if err != nil {
-			log.Println("[ERROR] During registration flow: ", err)
+			config.Opts.Logger.Error().Err(err).Msg("[ERROR] During registration flow")
 			return c.JSON(http.StatusInternalServerError, map[string]string{
 				"error": err.Error(),
 			})
@@ -47,7 +46,7 @@ func ResetPassword(userHandler service.UserHandlerer) echo.HandlerFunc {
 		user := &models.User{}
 		err := c.Bind(user)
 		if err != nil {
-			log.Println("[ERROR] Failed binding user: ", err)
+			config.Opts.Logger.Error().Err(err).Msg("[ERROR] Failed binding user")
 			return err
 		}
 		if user.Email == "" {

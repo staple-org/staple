@@ -1,6 +1,10 @@
 package config
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/rs/zerolog"
+)
 
 // Config contains configuration options for the inner server of Staple.
 type Config struct {
@@ -22,6 +26,8 @@ type Config struct {
 		APIKey string
 	}
 	DevMode bool
+	Logger  zerolog.Logger
+	Debug   bool
 }
 
 // Opts represents server side configuration for Staple.
