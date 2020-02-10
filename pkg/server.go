@@ -49,7 +49,7 @@ func Serve() error {
 	config.Opts.Logger = zerolog.New(os.Stdout)
 
 	if e := config.Opts.Logger.Debug(); e.Enabled() {
-		config.Opts.Logger.Debug().Interface("config", config.Opts)
+		config.Opts.Logger.Debug().Interface("config", config.Opts).Msg("Debugging enabled...")
 	}
 
 	config.Opts.Logger.Info().Msg("Starting listener...")

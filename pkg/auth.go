@@ -23,6 +23,7 @@ func TokenHandler(userHandler service.UserHandlerer) echo.HandlerFunc {
 		user := &models.User{}
 		err := c.Bind(user)
 		if err != nil {
+			config.Opts.Logger.Error().Err(err).Msg("Failed to bind user")
 			return err
 		}
 		if user.Email == "" || user.Password == "" {
@@ -58,6 +59,7 @@ func TokenHandler(userHandler service.UserHandlerer) echo.HandlerFunc {
 		// Generate encoded token and send it as response.
 		t, err := token.SignedString([]byte(config.Opts.GlobalTokenKey))
 		if err != nil {
+			config.Opts.Logger.Error().Err(err).Msg("Failed to generate token.")
 			return err
 		}
 
@@ -87,6 +89,7 @@ func GetToken(c echo.Context) (*jwt.Token, error) {
 		}
 	})
 	if err != nil {
+		config.Opts.Logger.Error().Err(err).Msg("Failed to get token")
 		return nil, err
 	}
 
