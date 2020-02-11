@@ -7,7 +7,6 @@ import {
 import LoaderButton from "../components/LoaderButton";
 import { useFormFields } from "../libs/hooksLib";
 import "./Signup.css";
-import config from "../config";
 import Cookie from "js-cookie";
 
 export default function Signup(props) {
@@ -29,7 +28,7 @@ export default function Signup(props) {
 
   function getToken() {
     try {
-      fetch(config.HOST+'/get-token', {
+      fetch('/rest/api/1/get-token', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -65,7 +64,7 @@ export default function Signup(props) {
     setIsLoading(true);
   
     try {
-      fetch(config.HOST+'/register', {
+      fetch('/rest/api/1/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

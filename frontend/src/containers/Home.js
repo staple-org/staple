@@ -2,7 +2,6 @@ import React, {useEffect, useState} from "react";
 import {Col, FormGroup, Grid, ListGroup, ListGroupItem, PageHeader, Row} from "react-bootstrap";
 import {LinkContainer} from "react-router-bootstrap";
 import "./Home.css";
-import config from "../config";
 import Cookie from "js-cookie";
 import LoaderButton from "../components/LoaderButton";
 
@@ -17,7 +16,7 @@ export default function Home(props) {
     setIsLoading(true);
     event.preventDefault();
     try {
-      fetch(config.HOST+`/staple/${id}/archive`, {
+      fetch(`/rest/api/1/staple/${id}/archive`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -38,7 +37,7 @@ export default function Home(props) {
     setIsDeleting(true);
     event.preventDefault();
     try {
-      fetch(config.HOST+`/staple/${id}`, {
+      fetch(`/rest/api/1/staple/${id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -150,7 +149,7 @@ export default function Home(props) {
       }
 
       try {
-        fetch(config.HOST+"/staple", {
+        fetch("/rest/api/1/staple", {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -164,7 +163,7 @@ export default function Home(props) {
       }
 
       try {
-        fetch(config.HOST+"/staple/next", {
+        fetch("/rest/api/1/staple/next", {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',

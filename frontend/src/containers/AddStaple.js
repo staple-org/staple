@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { FormGroup, FormControl } from "react-bootstrap";
 import LoaderButton from "../components/LoaderButton";
 import "./AddStaple.css";
-import config from "../config";
 import Cookie from "js-cookie";
 
 export default function AddStaple(props) {
@@ -20,7 +19,7 @@ export default function AddStaple(props) {
     event.preventDefault();
     setIsLoading(true);
     try {
-      fetch(config.HOST+"/staple", {
+      fetch("/rest/api/1/staple", {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
