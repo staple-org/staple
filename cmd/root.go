@@ -15,7 +15,7 @@ func init() {
 	flag.StringVar(&config.Opts.ServerKeyPath, "server-key-path", "", "--server-key-path /home/user/.server/server.key")
 	flag.StringVar(&config.Opts.ServerCrtPath, "server-crt-path", "", "--server-crt-path /home/user/.server/server.crt")
 	flag.StringVar(&config.Opts.Port, "port", "9998", "--port 443")
-	flag.StringVar(&config.Opts.Hostname, "hostname", "localhost", "--hostname staple-clipper.org")
+	flag.StringVar(&config.Opts.Hostname, "hostname", "", "--hostname staple-clipper.org")
 	flag.StringVar(&config.Opts.GlobalTokenKey, "token-key", "", "--token-key <random-data>")
 	flag.StringVar(&config.Opts.Database.Hostname, "staple-db-hostname", "localhost", "--staple-db-hostname localhost")
 	flag.StringVar(&config.Opts.Database.Database, "staple-db-database", "staples", "--staple-db-database staples")
