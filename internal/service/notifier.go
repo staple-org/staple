@@ -22,6 +22,8 @@ var (
 	PasswordReset Event = "Password Reset"
 	// GenerateConfirmCode is an event before password reset which sends a confirm code to the user's email address.
 	GenerateConfirmCode Event = "Confirm Code"
+	// Welcome template for new sign-ups.
+	Welcome Event = "Welcome"
 )
 
 // Notifier notifies the user of some event.
@@ -38,8 +40,8 @@ func NewEmailNotifier() EmailNotifier {
 }
 
 var (
-	domain                = config.Opts.Mailer.Domain
-	mgAPIKey              = config.Opts.Mailer.APIKey
+	welcomeTemplate = `Dear %s
+Thank you for signing up to Staple. Enjoy your stack based bookmarks!`
 	passwordResetTemplate = `Dear %s
 Your password has been successfully reset to: %s. Please change as soon as possible.`
 	confirmCodeTemplate = `Dear %s
@@ -49,10 +51,12 @@ Please enter the following code into the confirm code window: %s`
 // Notify attempts to send out an email using mailgun contaning the new password.
 // Does not need to be a pointer receiver because it isn't storing anything.
 func (e EmailNotifier) Notify(email string, event Event, payload string) error {
+	domain := config.Opts.Mailer.Domain
+	apiKey := config.Opts.Mailer.APIKey
 	sender := fmt.Sprintf("no-reply@%s", domain)
 	subject := fmt.Sprintf("[%s] %s Notification", time.Now().Format("2006-01-02"), event)
 
-	if domain == "" && mgAPIKey == "" {
+	if domain == "" && apiKey == "" {
 		config.Opts.Logger.Warn().Msg("[WARNING] Mailgun not set up. Falling back to console output...")
 		config.Opts.Logger.Info().Str("email", email).Str("subject", subject).Str("payload", payload).Msg("A notification attempt was made for user.")
 		return nil
@@ -64,9 +68,11 @@ func (e EmailNotifier) Notify(email string, event Event, payload string) error {
 		body = fmt.Sprintf(passwordResetTemplate, email, payload)
 	case GenerateConfirmCode:
 		body = fmt.Sprintf(confirmCodeTemplate, email, payload)
+	case Welcome:
+		body = fmt.Sprintf(welcomeTemplate, email)
 	}
 
-	mg := mailgun.NewMailgun(domain, mgAPIKey)
+	mg := mailgun.NewMailgun(domain, apiKey)
 	message := mg.NewMessage(sender, subject, body, email)
 	_, _, err := mg.Send(message)
 	return err
