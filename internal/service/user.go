@@ -66,9 +66,13 @@ func (u UserHandler) Delete(user models.User) error {
 // ResetPassword generates a new password for a user and send it via email.
 // This happens after the confirmation was successfull.
 func (u UserHandler) ResetPassword(user models.User) error {
-	bytes := make([]byte, 20)
-	_, err := rand.Read(bytes)
+	// get the stored user based on the provided email.
+	storedUser, err := u.store.Get(user.Email)
 	if err != nil {
+		return err
+	}
+	bytes := make([]byte, 20)
+	if _, err := rand.Read(bytes); err != nil {
 		return err
 	}
 	for i, b := range bytes {
@@ -79,14 +83,13 @@ func (u UserHandler) ResetPassword(user models.User) error {
 	if err != nil {
 		return err
 	}
-
-	user.Password = string(hashPassword)
-	user.ConfirmCode = ""
-	if err := u.store.Update(user.Email, user); err != nil {
+	storedUser.Password = string(hashPassword)
+	storedUser.ConfirmCode = ""
+	if err := u.store.Update(storedUser.Email, *storedUser); err != nil {
 		return err
 	}
 
-	return u.notifier.Notify(user.Email, PasswordReset, newPassword)
+	return u.notifier.Notify(storedUser.Email, PasswordReset, newPassword)
 }
 
 // SendConfirmCode sends a confirm code which has to be verified.
