@@ -5,7 +5,12 @@ body {
   font-size: 16px;
   color: #333;
   /*background-color: slategray;*/
-  background-image: url("background_1.jpg");
+  /* background-image: url("background_1.jpg");
+  background-size: auto;
+  background-repeat: no-repeat; */
+  background-color: #baf9ff;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 900'%3E%3Cpolygon fill='%233db8ff' points='957 450 539 900 1396 900'/%3E%3Cpolygon fill='%230036aa' points='957 450 872.9 900 1396 900'/%3E%3Cpolygon fill='%231ba0f1' points='-60 900 398 662 816 900'/%3E%3Cpolygon fill='%230045b0' points='337 900 398 662 816 900'/%3E%3Cpolygon fill='%230088e2' points='1203 546 1552 900 876 900'/%3E%3Cpolygon fill='%230052b5' points='1203 546 1552 900 1162 900'/%3E%3Cpolygon fill='%230070d2' points='641 695 886 900 367 900'/%3E%3Cpolygon fill='%23005eb8' points='587 900 641 695 886 900'/%3E%3Cpolygon fill='%230058bf' points='1710 900 1401 632 1096 900'/%3E%3Cpolygon fill='%23006ab9' points='1710 900 1401 632 1365 900'/%3E%3Cpolygon fill='%231b3faa' points='1210 900 971 687 725 900'/%3E%3Cpolygon fill='%231e75ba' points='943 900 1210 900 971 687'/%3E%3C/svg%3E");
+  background-attachment: fixed;
   background-size: cover;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

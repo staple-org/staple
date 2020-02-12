@@ -91,7 +91,9 @@ export default function Archives(props) {
         <div className="Staples">
           <form>
             <FormGroup controlId="content" className="staple-view">
-              <pre>{staple.staple.content}</pre>
+              <div className="staple-view-div">
+                <pre>{staple.staple.content}</pre>
+              </div>
             </FormGroup>
             <LoaderButton
               block

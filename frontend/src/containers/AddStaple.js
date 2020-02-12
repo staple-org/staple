@@ -55,6 +55,8 @@ export default function AddStaple(props) {
             value={content}
             componentClass="textarea"
             onChange={e => setContent(e.target.value)}
+            rows={30}
+            scrolling
           />
         </FormGroup>
         <LoaderButton

@@ -6,5 +6,7 @@
     margin-bottom: 5px;
 }
 
-.Staples {
+.Staples .staple-view-div {
+    overflow-y: auto;
+    max-height: 500px;
 }

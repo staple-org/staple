@@ -72,7 +72,9 @@ export default function Home(props) {
         <div className="Staples">
           <form>
             <FormGroup controlId="content" className="staple-view">
-              <pre>{nextStaple.staple.content}</pre>
+              <div className="staple-view-div">
+                <pre>{nextStaple.staple.content}</pre>
+              </div>
             </FormGroup>
             <LoaderButton
               block
