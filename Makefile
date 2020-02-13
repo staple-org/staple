@@ -47,3 +47,6 @@ static_assets:
 	go get github.com/GeertJohan/go.rice && \
 	go get github.com/GeertJohan/go.rice/rice && \
 	cd pkg && rm rice-box.go && rice embed-go
+
+docker_image:
+	docker build -t $(image):$(version) .

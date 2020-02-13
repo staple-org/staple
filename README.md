@@ -30,7 +30,7 @@ mkcert -key-file key.pem -cert-file cert.pem localhost
 # Deploying
 
 All settings are through command line options. These options are defined through vault or
-kubernetes secret storage.
+kubernetes secret storage. Find the infrastructure deployment scripts under [Infrastructre Repository](https://github.com/staple-org/infrastructure).
 
 # Local Development
 
@@ -38,3 +38,21 @@ In order to work on the frontend and not having to constantly build static compo
 under the name REACT_APP_DEV_HOST. This, if set to something like `http://localhost:9998` (where normally the
 backend would run in a local environment) and starting the backend in dev mode with `--dev` will result in a
 de-coupled development experience.
+
+# Production
+
+In order to build production assets for the frontend run:
+
+```
+make static_assets
+make
+```
+
+Then build a docker image with:
+
+```
+make image="staple-org/staple" version=`git describe --exact-match --tags $(git log -n1 --pretty='%h')` docker_image
+```
+
+...and continue with deployment the container with Kubernetes. The `image` and `version` variables are provided
+for convenience to define your own docker image.
