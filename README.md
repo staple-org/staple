@@ -19,7 +19,7 @@ for eternity... unread. Never to be known.
 
 Staples also provides a frontend written with React located here: [Staple Frontend](https://github.com/staple-org/frontend).
 
-But it's totally okay to use staple through the API only. 
+But it's totally okay to use staple through the API only.
 
 # Testing localhost https
 
