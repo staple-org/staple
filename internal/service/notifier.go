@@ -41,7 +41,7 @@ func NewEmailNotifier() EmailNotifier {
 
 var (
 	welcomeTemplate = `Dear %s
-Thank you for signing up to Staple. Enjoy your stack based bookmarks!`
+Thank you for signing up to Staple. Enjoy your queue based bookmarks!`
 	passwordResetTemplate = `Dear %s
 Your password has been successfully reset to: %s. Please change as soon as possible.`
 	confirmCodeTemplate = `Dear %s
