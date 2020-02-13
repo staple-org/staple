@@ -4,6 +4,7 @@ import {LinkContainer} from "react-router-bootstrap";
 import "./Home.css";
 import Cookie from "js-cookie";
 import LoaderButton from "../components/LoaderButton";
+import config from "../config";
 
 export default function Home(props) {
   const [staples, setStaples] = useState([]);
@@ -16,7 +17,7 @@ export default function Home(props) {
     setIsLoading(true);
     event.preventDefault();
     try {
-      fetch(`/rest/api/1/staple/${id}/archive`, {
+      fetch(config.DEV_HOST + `/rest/api/1/staple/${id}/archive`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -37,7 +38,7 @@ export default function Home(props) {
     setIsDeleting(true);
     event.preventDefault();
     try {
-      fetch(`/rest/api/1/staple/${id}`, {
+      fetch(config.DEV_HOST + `/rest/api/1/staple/${id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -151,7 +152,7 @@ export default function Home(props) {
       }
 
       try {
-        fetch("/rest/api/1/staple", {
+        fetch(config.DEV_HOST + "/rest/api/1/staple", {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -165,7 +166,7 @@ export default function Home(props) {
       }
 
       try {
-        fetch("/rest/api/1/staple/next", {
+        fetch(config.DEV_HOST + "/rest/api/1/staple/next", {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',

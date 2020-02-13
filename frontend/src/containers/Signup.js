@@ -8,6 +8,7 @@ import LoaderButton from "../components/LoaderButton";
 import { useFormFields } from "../libs/hooksLib";
 import "./Signup.css";
 import Cookie from "js-cookie";
+import config from "../config";
 
 export default function Signup(props) {
   const [fields, handleFieldChange] = useFormFields({
@@ -28,7 +29,7 @@ export default function Signup(props) {
 
   function getToken() {
     try {
-      fetch('/rest/api/1/get-token', {
+      fetch(config.DEV_HOST + '/rest/api/1/get-token', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -50,7 +51,6 @@ export default function Signup(props) {
         .catch((error) => {
           alert(error.message);
         });
-      // probably will create a state and store it in state/
     } catch (e) {
       alert(e.message);
     } finally {
@@ -60,11 +60,10 @@ export default function Signup(props) {
 
   async function handleSubmit(event) {
     event.preventDefault();
-  
     setIsLoading(true);
-  
+
     try {
-      fetch('/rest/api/1/register', {
+      fetch(config.DEV_HOST + '/rest/api/1/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

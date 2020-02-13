@@ -2,6 +2,7 @@ import React, {useState} from "react";
 import "./ResetPassword.css";
 import {ControlLabel, FormControl, FormGroup, HelpBlock} from "react-bootstrap";
 import LoaderButton from "../components/LoaderButton";
+import config from "../config";
 
 export default function ResetPassword(props) {
   const [isVerifying, setIsVerifying] = useState(false);
@@ -23,7 +24,7 @@ export default function ResetPassword(props) {
     setIsLoading(true);
 
     try {
-      fetch('/rest/api/1/reset', {
+      fetch(config.DEV_HOST + '/rest/api/1/reset', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -53,7 +54,7 @@ export default function ResetPassword(props) {
     setIsLoading(true);
 
     try {
-      fetch('/rest/api/1/verify', {
+      fetch(config.DEV_HOST + '/rest/api/1/verify', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

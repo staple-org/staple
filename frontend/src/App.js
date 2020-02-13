@@ -9,11 +9,11 @@ import Cookie from "js-cookie";
 function App(props) {
   const [isAuthenticated, userHasAuthenticated] = useState(false);
   const [isAuthenticating, setIsAuthenticating] = useState(true);
-  
+
   useEffect(() => {
     onLoad();
   }, []);
-  
+
   async function onLoad() {
     try {
       if (Cookie.get('token')) {
@@ -25,7 +25,7 @@ function App(props) {
         alert(e);
       }
     }
-  
+
     setIsAuthenticating(false);
   }
 
@@ -34,7 +34,7 @@ function App(props) {
     // Clear cookie from session store.
     Cookie.remove("token");
     userHasAuthenticated(false);
-    
+
     props.history.push("/login");
   }
 

@@ -3,6 +3,7 @@ import {Col, ControlLabel, FormControl, FormGroup, Grid, Row} from "react-bootst
 import LoaderButton from "../components/LoaderButton";
 import {useFormFields} from "../libs/hooksLib";
 import Cookie from "js-cookie";
+import config from "../config";
 
 export default function Settings(props) {
   const [fields, handleFieldChange] = useFormFields({
@@ -17,7 +18,7 @@ export default function Settings(props) {
     setIsLoading(true);
 
     try {
-      fetch('/rest/api/1/user/max-staples', {
+      fetch(config.DEV_HOST + '/rest/api/1/user/max-staples', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -56,7 +57,7 @@ export default function Settings(props) {
     setIsLoading(true);
 
     try {
-      fetch('/rest/api/1/user/change-password', {
+      fetch(config.DEV_HOST + '/rest/api/1/user/change-password', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -93,7 +94,7 @@ export default function Settings(props) {
 
   async function onLoad() {
     try {
-      fetch("/rest/api/1/user/max-staples", {
+      fetch(config.DEV_HOST + "/rest/api/1/user/max-staples", {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

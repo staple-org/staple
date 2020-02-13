@@ -3,6 +3,7 @@ import Cookie from "js-cookie";
 import {FormGroup, Grid, Row, Col, PageHeader, ListGroup} from "react-bootstrap";
 import LoaderButton from "../components/LoaderButton";
 import "./Archives.css";
+import config from "../config";
 
 export default function Archives(props) {
   const [staple, setStaple] = useState({});
@@ -13,7 +14,7 @@ export default function Archives(props) {
   async function onLoad() {
     setIsLoading(true);
     try {
-      fetch("/rest/api/1/staple/archive", {
+      fetch(config.DEV_HOST + "/rest/api/1/staple/archive", {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -35,7 +36,7 @@ export default function Archives(props) {
   async function handleDelete(id) {
     setIsDeleting(true);
     try {
-      fetch(`/rest/api/1/staple/${id}`, {
+      fetch(config.DEV_HOST + `/rest/api/1/staple/${id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -58,7 +59,7 @@ export default function Archives(props) {
 
   function fetchStaple(id) {
     try {
-      fetch(`/rest/api/1/staple/${id}`, {
+      fetch(config.DEV_HOST + `/rest/api/1/staple/${id}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
