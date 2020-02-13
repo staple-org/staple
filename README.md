@@ -25,19 +25,19 @@ But it's totally okay to use staple through the API only.
 
 The main front
 
-[homepage](img/homepage.png)
+![homepage](img/homepage.png)
 
 The main with a couple of staples
 
-[staples](img/staples.png)
+![staples](img/staples.png)
 
 The lists are only viewed in FIFO order. After archiving though, they can be viewed in any order.
 
-[archive](img/archive.png)
+![archive](img/archive.png)
 
 And a couple of settings and the option to change your password...
 
-[settings](img/settings.png)
+![settings](img/settings.png)
 
 # Testing localhost https
 
