@@ -74,3 +74,30 @@ make image="staple-org/staple" version=`git describe --exact-match --tags $(git 
 
 ...and continue with deployment the container with Kubernetes. The `image` and `version` variables are provided
 for convenience to define your own docker image.
+
+# API
+
+If you are not a fan of using a web-site you have the option to use the API with postman or another front which can
+store tokens and send requests. For example to log in, request a token with:
+
+```
+curl -X POST -H 'content-type: application/json' -d'{"email": "your@email.com", "password": "test"}' https://staple.cronohub.org/rest/api/1/get-token
+```
+
+You should get back something like this:
+
+```
+{"token":"JWT-TOKEN"}
+```
+
+Then you can use this token in consecutive requests to list staples archive, delete or things like that:
+
+```
+curl -X GET -H 'Authorization: Bearer TOKEN' https://staple.cronohub.org/rest/api/1/staple/next
+```
+
+Should get you something like:
+
+```
+{"staple":{"name":"Kubernetes Nodes","id":11,"content":"CONTENT","created_at":"2020-02-13T19:07:13.982385Z","archived":false}}
+```
