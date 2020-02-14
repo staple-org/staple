@@ -47,7 +47,7 @@ func (u UserHandler) Register(user models.User) error {
 	if err != nil {
 		return err
 	}
-	return nil
+	return u.notifier.Notify(user.Email, Welcome, "")
 }
 
 // Delete removes a user.
