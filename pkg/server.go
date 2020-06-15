@@ -6,13 +6,10 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
-	"log"
-	"net/http"
 	"os"
 
 	"github.com/rs/zerolog"
 
-	rice "github.com/GeertJohan/go.rice"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"golang.org/x/crypto/acme/autocert"
@@ -59,33 +56,6 @@ func Serve() error {
 	e.Use(middleware.Recover())
 	e.Use(middleware.CORS())
 
-	// Setup front-end if not in production mode.
-	if !config.Opts.DevMode {
-		staticAssets, err := rice.FindBox("../frontend/build")
-		if err != nil {
-			log.Fatal("Cannot find assets in production")
-			return err
-		}
-
-		// Register handler for static assets
-		assetHandler := http.FileServer(staticAssets.HTTPBox())
-		index, err := staticAssets.Open("index.html")
-		if err != nil {
-			config.Opts.Logger.Error().Err(err).Msg("Failed to find index.html content.")
-			return err
-		}
-
-		e.GET("/", echo.WrapHandler(assetHandler))
-		// Set up routes to index.html for all routes under Routes.js. Index.html will handle the routing any further.
-		for _, r := range routes {
-			e.GET(r, indexServer(r, index))
-		}
-		e.GET("/favicon.ico", echo.WrapHandler(assetHandler))
-		e.GET("/site.webmanifest", echo.WrapHandler(assetHandler))
-		e.GET("/static/css/*", echo.WrapHandler(http.StripPrefix("/", assetHandler)))
-		e.GET("/static/js/*", echo.WrapHandler(http.StripPrefix("/", assetHandler)))
-		e.GET("/static/media/*", echo.WrapHandler(http.StripPrefix("/", assetHandler)))
-	}
 	// Register a user.
 	ctx := context.Background()
 	postgresUserStorer := storage.NewPostgresUserStorer()
@@ -138,14 +108,4 @@ func Serve() error {
 	}
 	// Start regular server
 	return e.Start(hostPort)
-}
-
-// indexServer takes a name and the contents of the virtual file index.html gathered up by ricebox
-// and serves its content via http.ServeContent under the given name.
-func indexServer(name string, file *rice.File) echo.HandlerFunc {
-	return func(c echo.Context) error {
-		stat, _ := file.Stat()
-		http.ServeContent(c.Response().Writer, c.Request(), name, stat.ModTime(), file)
-		return nil
-	}
 }
