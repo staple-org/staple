@@ -1,6 +1,15 @@
 package storage
 
-import "github.com/staple-org/staple/internal/models"
+import (
+	"time"
+
+	"github.com/staple-org/staple/internal/models"
+)
+
+const (
+	// timeout for all transactions
+	timeoutForTransactions = 1 * time.Minute
+)
 
 // StapleStorer defines a set of functions for storing staples.
 type StapleStorer interface {

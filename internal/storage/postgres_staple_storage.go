@@ -34,15 +34,25 @@ func (p PostgresStapleStorer) Create(staple models.Staple, email string) error {
 	if err != nil {
 		return err
 	}
-	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutForTransactions)
+	defer cancel()
+
 	defer conn.Close(ctx)
-	_, err = conn.Exec(ctx, "insert into staples(name, content, archived, created_at, user_email) values($1, $2, $3, $4, $5)",
+	tx, err := conn.Begin(ctx)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback(ctx)
+
+	if _, err := tx.Exec(ctx, "insert into staples(name, content, archived, created_at, user_email) values($1, $2, $3, $4, $5)",
 		staple.Name,
 		staple.Content,
 		staple.Archived,
 		staple.CreatedAt,
-		email)
-	return err
+		email); err != nil {
+		return err
+	}
+	return tx.Commit(ctx)
 }
 
 // Delete removes a staple.
@@ -51,10 +61,20 @@ func (p PostgresStapleStorer) Delete(email string, stapleID int) error {
 	if err != nil {
 		return err
 	}
-	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutForTransactions)
+	defer cancel()
+
 	defer conn.Close(ctx)
-	_, err = conn.Exec(ctx, "delete from staples where id = $1 and user_email = $2", stapleID, email)
-	return err
+	tx, err := conn.Begin(ctx)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback(ctx)
+
+	if _, err := tx.Exec(ctx, "delete from staples where id = $1 and user_email = $2", stapleID, email); err != nil {
+		return err
+	}
+	return tx.Commit(ctx)
 }
 
 // Get retrieves a staple.
@@ -63,24 +83,36 @@ func (p PostgresStapleStorer) Get(email string, stapleID int) (*models.Staple, e
 	if err != nil {
 		return nil, err
 	}
-	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutForTransactions)
+	defer cancel()
+
 	defer conn.Close(ctx)
+	tx, err := conn.Begin(ctx)
+	if err != nil {
+		return nil, err
+	}
+	defer tx.Rollback(ctx)
 	var (
 		id            int
 		name, content string
 		archived      bool
 		createdAt     time.Time
 	)
-	err = conn.QueryRow(ctx, "select name, id, content, archived, created_at from staples where user_email = $1 and id = $2", email, stapleID).Scan(
+	if err := tx.QueryRow(ctx, "select name, id, content, archived, created_at from staples where user_email = $1 and id = $2", email, stapleID).Scan(
 		&name,
 		&id,
 		&content,
 		&archived,
-		&createdAt)
+		&createdAt); err != nil {
+		return nil, err
+	}
 	if err != nil {
 		if err.Error() == "no rows in result set" {
 			return nil, nil
 		}
+		return nil, err
+	}
+	if err := tx.Commit(ctx); err != nil {
 		return nil, err
 	}
 	return &models.Staple{
@@ -98,24 +130,36 @@ func (p PostgresStapleStorer) Oldest(email string) (*models.Staple, error) {
 	if err != nil {
 		return nil, err
 	}
-	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutForTransactions)
+	defer cancel()
+
 	defer conn.Close(ctx)
+	tx, err := conn.Begin(ctx)
+	if err != nil {
+		return nil, err
+	}
+	defer tx.Rollback(ctx)
 	var (
 		id            int
 		name, content string
 		archived      bool
 		createdAt     time.Time
 	)
-	err = conn.QueryRow(ctx, "select name, id, content, archived, created_at from staples s1 where created_at = (select MIN(created_at) from staples s2 where s2.id = s1.id and s2.user_email = $1 and s2.archived = false)", email).Scan(
+	if err := tx.QueryRow(ctx, "select name, id, content, archived, created_at from staples s1 where created_at = (select MIN(created_at) from staples s2 where s2.id = s1.id and s2.user_email = $1 and s2.archived = false)", email).Scan(
 		&name,
 		&id,
 		&content,
 		&archived,
-		&createdAt)
+		&createdAt); err != nil {
+		return nil, err
+	}
 	if err != nil {
 		if err.Error() == "no rows in result set" {
 			return nil, nil
 		}
+		return nil, err
+	}
+	if err := tx.Commit(ctx); err != nil {
 		return nil, err
 	}
 	return &models.Staple{
@@ -147,9 +191,17 @@ func (p PostgresStapleStorer) List(email string) ([]models.Staple, error) {
 	if err != nil {
 		return nil, err
 	}
-	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutForTransactions)
+	defer cancel()
+
 	defer conn.Close(ctx)
-	rows, err := conn.Query(ctx, "select name, id, archived, created_at from staples where user_email=$1 and archived = false", email)
+	tx, err := conn.Begin(ctx)
+	if err != nil {
+		return nil, err
+	}
+	defer tx.Rollback(ctx)
+
+	rows, err := tx.Query(ctx, "select name, id, archived, created_at from staples where user_email=$1 and archived = false", email)
 	if err != nil {
 		return nil, err
 	}
@@ -161,6 +213,9 @@ func (p PostgresStapleStorer) List(email string) ([]models.Staple, error) {
 			return nil, err
 		}
 		ret = append(ret, staple)
+	}
+	if err := tx.Commit(ctx); err != nil {
+		return nil, err
 	}
 	return ret, nil
 }
@@ -171,9 +226,17 @@ func (p PostgresStapleStorer) ShowArchive(email string) ([]models.Staple, error)
 	if err != nil {
 		return nil, err
 	}
-	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutForTransactions)
+	defer cancel()
+
 	defer conn.Close(ctx)
-	rows, err := conn.Query(ctx, "select name, id, archived, created_at from staples where user_email=$1 and archived = true order by id", email)
+	tx, err := conn.Begin(ctx)
+	if err != nil {
+		return nil, err
+	}
+	defer tx.Rollback(ctx)
+
+	rows, err := tx.Query(ctx, "select name, id, archived, created_at from staples where user_email=$1 and archived = true order by id", email)
 	if err != nil {
 		return nil, err
 	}
@@ -185,6 +248,9 @@ func (p PostgresStapleStorer) ShowArchive(email string) ([]models.Staple, error)
 			return nil, err
 		}
 		ret = append(ret, staple)
+	}
+	if err := tx.Commit(ctx); err != nil {
+		return nil, err
 	}
 	return ret, nil
 }

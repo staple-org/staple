@@ -29,14 +29,26 @@ func (s PostgresUserStorer) Create(email string, password []byte) error {
 	if err != nil {
 		return err
 	}
-	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutForTransactions)
+	defer cancel()
+
 	defer conn.Close(ctx)
-	_, err = conn.Exec(ctx, "insert into users(email, password, confirm_code, max_staples) values($1, $2, $3, $4)",
+
+	tx, err := conn.Begin(ctx)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback(ctx)
+
+	if _, err := tx.Exec(ctx, "insert into users(email, password, confirm_code, max_staples) values($1, $2, $3, $4)",
 		email,
 		password,
 		"",
-		DefaultMaxStaples)
-	return err
+		DefaultMaxStaples); err != nil {
+		return err
+	}
+
+	return tx.Commit(ctx)
 }
 
 // Delete deletes a user from the db.
@@ -45,11 +57,23 @@ func (s PostgresUserStorer) Delete(email string) error {
 	if err != nil {
 		return err
 	}
-	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutForTransactions)
+	defer cancel()
+
 	defer conn.Close(ctx)
-	_, err = conn.Exec(ctx, "delete from users where email = $1",
-		email)
-	return err
+
+	tx, err := conn.Begin(ctx)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback(ctx)
+
+	if _, err = tx.Exec(ctx, "delete from users where email = $1",
+		email); err != nil {
+		return err
+	}
+
+	return tx.Commit(ctx)
 }
 
 // Get retrieves a user.
@@ -58,7 +82,9 @@ func (s PostgresUserStorer) Get(email string) (*models.User, error) {
 	if err != nil {
 		return nil, err
 	}
-	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutForTransactions)
+	defer cancel()
+
 	defer conn.Close(ctx)
 	var (
 		storedEmail string
@@ -66,11 +92,20 @@ func (s PostgresUserStorer) Get(email string) (*models.User, error) {
 		confirmCode string
 		maxStaples  int
 	)
-	err = conn.QueryRow(ctx, "select email, password, confirm_code, max_staples from users where email = $1", email).Scan(&storedEmail, &password, &confirmCode, &maxStaples)
+	tx, err := conn.Begin(ctx)
+	if err != nil {
+		return nil, err
+	}
+	defer tx.Rollback(ctx)
+
+	err = tx.QueryRow(ctx, "select email, password, confirm_code, max_staples from users where email = $1", email).Scan(&storedEmail, &password, &confirmCode, &maxStaples)
 	if err != nil {
 		if err.Error() == "no rows in result set" {
 			return nil, nil
 		}
+		return nil, err
+	}
+	if err := tx.Commit(ctx); err != nil {
 		return nil, err
 	}
 	return &models.User{
@@ -86,14 +121,25 @@ func (s PostgresUserStorer) Update(email string, newUser models.User) error {
 	if err != nil {
 		return err
 	}
-	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutForTransactions)
+	defer cancel()
+
 	defer conn.Close(ctx)
-	_, err = conn.Exec(ctx, "update users set email=$1, password=$2, confirm_code=$3, max_staples=$4 where email=$5",
+	tx, err := conn.Begin(ctx)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback(ctx) // this is safe to call even if commit is called first.
+
+	if _, err = tx.Exec(ctx, "update users set email=$1, password=$2, confirm_code=$3, max_staples=$4 where email=$5",
 		newUser.Email,
 		newUser.Password,
 		newUser.ConfirmCode,
 		newUser.MaxStaples,
-		email)
+		email); err != nil {
+		return err
+	}
+	err = tx.Commit(ctx)
 	return err
 }
 

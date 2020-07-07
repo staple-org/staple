@@ -1,9 +1,8 @@
 module github.com/staple-org/staple
 
-go 1.12
+go 1.14
 
 require (
-	github.com/GeertJohan/go.rice v1.0.0
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/facebookgo/ensure v0.0.0-20160127193407-b4ab57deab51 // indirect
 	github.com/facebookgo/stack v0.0.0-20160209184415-751773369052 // indirect
