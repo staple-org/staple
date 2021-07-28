@@ -3,11 +3,11 @@ module github.com/staple-org/staple
 go 1.14
 
 require (
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/facebookgo/ensure v0.0.0-20160127193407-b4ab57deab51 // indirect
 	github.com/facebookgo/stack v0.0.0-20160209184415-751773369052 // indirect
 	github.com/facebookgo/subset v0.0.0-20150612182917-8dac2c3c4870 // indirect
 	github.com/gobuffalo/envy v1.8.1 // indirect
+	github.com/golang-jwt/jwt v3.2.1+incompatible
 	github.com/google/uuid v1.1.1
 	github.com/jackc/pgx/v4 v4.1.2
 	github.com/labstack/echo/v4 v4.1.11
