@@ -16,6 +16,10 @@ binaries:
 		-tags="netgo" \
 		./...
 
+.PHONY: lint
+lint:
+	golangci-lint run --timeout 30m
+
 .PHONY: build
 build:
 	go build -ldflags="-s -w" -i -o ${BUILDDIR}/${NAME} cmd/root.go
@@ -31,9 +35,6 @@ test:
 .PHONY: clean
 clean:
 	go clean -i
-
-lint:
-	golint -set_exit_status ./...
 
 .PHONY: run
 run:
